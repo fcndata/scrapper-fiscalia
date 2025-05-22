@@ -1,0 +1,16 @@
+tools:
+  chromedriver_path: tools/chromedriver/chromedriver.exe
+  chromium_path: tools/chromium/chrome.exe
+
+url:
+  url_1: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=18-05-2025
+  url_2: /mnt/photos
+  output_log_file: logs/failed_uploads.csv
+
+creds:
+  google_client_secret_file: ./credentials/google_credentials.json
+  token_file: ./credentials/token.json
+
+execute:
+  headless: true
+  dry_run: true
