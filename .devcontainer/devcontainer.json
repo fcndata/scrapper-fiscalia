@@ -1,0 +1,15 @@
+{
+    "name": "Scraper Fiscalia",
+    "dockerFile": "Dockerfile",
+    "context": "..",
+    "runArgs": [
+        "--shm-size=2gb",
+        "--privileged"
+    ], // necesario para que chromium funcione bien en docker
+    "settings": {
+        "python.pythonPath": "/usr/local/bin/python",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "remoteUser": "root"
+}

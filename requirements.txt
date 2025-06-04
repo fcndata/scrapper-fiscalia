@@ -1,0 +1,6 @@
+selenium
+pydantic
+pandas
+beautifulsoup4
+lxml
+pyyaml

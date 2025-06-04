@@ -1,16 +1,13 @@
-tools:
-  chromedriver_path: tools/chromedriver/chromedriver.exe
-  chromium_path: tools/chromium/chrome.exe
+scraper:
+  headless: New
+  user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+  timeout_seconds: 10
 
-url:
-  url_1: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=18-05-2025
-  url_2: /mnt/photos
-  output_log_file: logs/failed_uploads.csv
+urls: 
+  url_1: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=
+  url_2: https://otra-pagina.cl
+  
+output:
+  log_file: logs/failed_uploads.csv
+  json_output_folder: data/output
 
-creds:
-  google_client_secret_file: ./credentials/google_credentials.json
-  token_file: ./credentials/token.json
-
-execute:
-  headless: true
-  dry_run: true

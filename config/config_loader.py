@@ -11,7 +11,7 @@ class Config:
 
     def get(self, key: str, default=None):
         """
-        Allows dot notation access: config.get("tools.chromedriver_path")
+        Allows dot notation access: config.get("url.url_1")
         """
         keys = key.split(".")
         value = self.config
@@ -23,10 +23,10 @@ class Config:
         return value
 
     def __getitem__(self, key):
-        return self.config[key]
+        return self.get(key)
 
     def __contains__(self, key):
-        return key in self.config
+        return self.get(key) is not None
 
     def __repr__(self):
         return f"<Config path={self.path}>"
