@@ -1,0 +1,271 @@
+2025-06-09 13:28:14,012 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:28:16,770 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:28:16,770 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:28:16,771 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:28:16,771 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:28:38,196 - INFO - Extrayendo filas de la tabla...
+2025-06-09 13:29:00,993 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:30:42,563 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:30:43,111 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:30:43,120 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:30:43,120 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:30:43,121 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:30:46,066 - INFO - Extrayendo filas de la tabla... {self.driver.current_url}
+2025-06-09 13:30:54,025 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:31:02,907 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:31:03,686 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:31:03,825 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:31:03,825 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:31:03,825 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:31:07,416 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:31:15,282 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:44:26,540 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:44:29,295 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:44:29,296 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:44:29,296 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:44:29,297 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:44:31,600 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:44:39,509 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:57:22,011 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:57:24,702 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:57:24,703 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:57:24,703 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:57:24,704 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:57:30,743 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:57:38,129 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:57:51,878 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:57:52,400 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:57:52,400 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:57:52,401 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:57:52,401 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:57:53,959 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:58:01,597 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:59:11,236 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:59:14,124 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:59:14,124 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:59:14,125 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:59:14,125 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:59:17,016 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:59:26,359 - INFO - Webdriver cerrado correctamente.
+2025-06-09 13:59:42,666 - INFO - Iniciando Webdriver con configs.
+2025-06-09 13:59:43,291 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 13:59:43,291 - INFO - Iniciando proceso de scraping.
+2025-06-09 13:59:43,292 - INFO - Cargando la página para URL : url_2
+2025-06-09 13:59:43,292 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:59:45,068 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 13:59:52,619 - INFO - Webdriver cerrado correctamente.
+2025-06-09 15:45:02,486 - INFO - Iniciando Webdriver con configs.
+2025-06-09 15:45:06,209 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 15:45:06,209 - INFO - Iniciando proceso de scraping.
+2025-06-09 15:45:06,210 - INFO - Cargando la página para URL : url_2
+2025-06-09 15:45:06,210 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 15:45:06,649 - INFO - Webdriver cerrado correctamente.
+2025-06-09 15:46:02,223 - INFO - Iniciando Webdriver con configs.
+2025-06-09 15:46:02,873 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 15:46:02,873 - INFO - Iniciando proceso de scraping.
+2025-06-09 15:46:02,874 - INFO - Cargando la página para URL : url_2
+2025-06-09 15:46:02,874 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 15:46:03,171 - INFO - Webdriver cerrado correctamente.
+2025-06-09 15:50:06,222 - INFO - Iniciando Webdriver con configs.
+2025-06-09 15:50:09,104 - INFO - ===> Iniciando trigger de scraping para URL key: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=
+2025-06-09 15:50:09,104 - INFO - Iniciando proceso de scraping.
+2025-06-09 15:50:09,105 - INFO - Cargando la página para URL : url_2
+2025-06-09 15:50:09,105 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 15:50:09,535 - INFO - Webdriver cerrado correctamente.
+2025-06-09 15:52:53,334 - INFO - Iniciando Webdriver con configs.
+2025-06-09 15:52:56,026 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 15:52:56,026 - INFO - Iniciando proceso de scraping.
+2025-06-09 15:52:56,027 - INFO - Cargando la página para URL : url_2
+2025-06-09 15:52:56,027 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 15:52:56,404 - INFO - Webdriver cerrado correctamente.
+2025-06-09 15:59:49,079 - INFO - Iniciando Webdriver con configs.
+2025-06-09 15:59:51,794 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 15:59:51,794 - INFO - Iniciando proceso de scraping.
+2025-06-09 15:59:51,794 - INFO - Cargando la página para URL : url_2
+2025-06-09 15:59:51,795 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 15:59:52,181 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:00:36,743 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:00:39,298 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:00:39,299 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:00:39,299 - INFO - Cargando la página para URL : url_2
+2025-06-09 16:00:39,300 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 16:00:39,320 - INFO - Extrayendo filas de la tabla... data:,
+2025-06-09 16:00:45,495 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:03:12,956 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:03:15,701 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:03:15,702 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:03:15,702 - INFO - Cargando la página para URL : url_2
+2025-06-09 16:03:15,702 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 16:03:15,719 - INFO - Extrayendo filas de la tabla... data:,
+2025-06-09 16:03:21,867 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:04:12,684 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:04:13,137 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:04:13,138 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:04:13,138 - INFO - Cargando la página para URL : url_2
+2025-06-09 16:04:13,138 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 16:04:13,150 - INFO - Extrayendo filas de la tabla... data:,
+2025-06-09 16:04:19,274 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:16:22,633 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:16:25,355 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:16:25,356 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:16:25,356 - INFO - Cargando la página para URL : url_2
+2025-06-09 16:16:25,357 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 16:16:29,230 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 16:16:37,595 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:22:47,946 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:22:50,838 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:22:50,839 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:22:50,932 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:23:16,160 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:23:16,699 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:23:16,700 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:23:16,840 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:23:37,157 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:23:37,610 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:23:37,611 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:23:37,696 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:25:53,410 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:25:53,851 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:25:53,851 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:25:53,935 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:28:20,747 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:28:21,431 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:28:21,431 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:28:21,542 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:29:33,528 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:29:34,058 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:29:34,058 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:29:34,194 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:29:59,019 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:29:59,446 - INFO - ===> Iniciando trigger de scraping para URL key: url_2
+2025-06-09 16:29:59,446 - ERROR - No se encontró URL para la key: url_2
+2025-06-09 16:29:59,595 - INFO - Webdriver cerrado correctamente.
+2025-06-09 16:30:44,591 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:30:45,027 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 16:30:45,028 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:30:45,028 - INFO - Cargando la página para URL : sociedades
+2025-06-09 16:30:45,028 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=05-06-2025
+2025-06-09 16:31:24,547 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=05-06-2025
+2025-06-09 16:31:25,728 - INFO - Se encontraron 941 filas en la tabla.
+2025-06-09 16:31:25,728 - INFO - Serializando las filas...
+2025-06-09 16:32:57,935 - INFO - Iniciando Webdriver con configs.
+2025-06-09 16:32:58,416 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 16:32:58,417 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:32:58,417 - INFO - Cargando la página para URL : sociedades
+2025-06-09 16:32:58,418 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=05-06-2025
+2025-06-09 16:33:04,136 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=05-06-2025
+2025-06-09 16:33:05,489 - INFO - Se encontraron 941 filas en la tabla.
+2025-06-09 16:33:05,489 - INFO - Serializando las filas...
+2025-06-09 16:33:10,306 - INFO - Se serializaron 941 registros.
+2025-06-09 16:33:10,306 - INFO - Proceso completo. Total registros: 941.
+2025-06-09 16:33:10,307 - INFO - Total registros extraídos: 941.
+2025-06-09 16:33:10,307 - INFO - Realizando validaciones previas al scraping...
+2025-06-09 16:33:10,345 - INFO - Guardando 941 registros en 'data/fiscalia_output.jsonl'...
+2025-06-09 16:33:10,377 - INFO - Se guardaron 941 registros en 'data/fiscalia_output.jsonl'.
+2025-06-09 16:33:10,377 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/fiscalia_output.jsonl
+2025-06-09 16:33:10,378 - INFO - ===> Iniciando trigger de scraping para URL key: diario_oficial
+2025-06-09 16:33:10,378 - INFO - Iniciando proceso de scraping.
+2025-06-09 16:33:10,379 - INFO - Cargando la página para URL : diario_oficial
+2025-06-09 16:33:10,379 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=05-06-2025
+2025-06-09 16:33:13,066 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=05-06-2025&edition=44166
+2025-06-09 16:33:15,807 - INFO - Se encontraron 184 filas en la tabla.
+2025-06-09 16:33:15,808 - INFO - Actualizando actuacion: 'CONSTITUCIÓN'
+2025-06-09 16:33:15,817 - INFO - Actualizando actuacion: 'MODIFICACIÓN'
+2025-06-09 16:33:15,826 - INFO - Actualizando actuacion: 'DISOLUCIÓN'
+2025-06-09 16:33:15,827 - INFO - Actualizando actuacion: 'MIGRACIÓN'
+2025-06-09 16:33:15,828 - INFO - Se serializaron 162 registros.
+2025-06-09 16:33:15,829 - INFO - Proceso completo. Total registros: 162.
+2025-06-09 16:33:15,829 - INFO - Total registros extraídos: 162.
+2025-06-09 16:33:15,829 - INFO - Guardando 162 registros en 'data/pime_output.jsonl'...
+2025-06-09 16:33:15,837 - INFO - Se guardaron 162 registros en 'data/pime_output.jsonl'.
+2025-06-09 16:33:15,838 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/pime_output.jsonl
+2025-06-09 17:07:45,822 - INFO - Iniciando Webdriver con configs.
+2025-06-09 17:07:48,555 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 17:07:48,555 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:07:48,555 - INFO - Cargando la página para URL : sociedades
+2025-06-09 17:07:48,556 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:08:38,487 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:08:38,892 - INFO - Se encontraron 203 filas en la tabla.
+2025-06-09 17:08:38,892 - INFO - Serializando las filas...
+2025-06-09 17:08:39,917 - INFO - Se serializaron 203 registros.
+2025-06-09 17:08:39,918 - INFO - Proceso completo. Total registros: 203.
+2025-06-09 17:08:39,918 - INFO - Total registros extraídos: 203.
+2025-06-09 17:08:39,918 - INFO - Realizando validaciones previas al scraping...
+2025-06-09 17:08:39,962 - INFO - Guardando 203 registros en 'data/fiscalia_output.jsonl'...
+2025-06-09 17:08:39,973 - INFO - Se guardaron 203 registros en 'data/fiscalia_output.jsonl'.
+2025-06-09 17:08:39,974 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/fiscalia_output.jsonl
+2025-06-09 17:08:39,974 - INFO - ===> Iniciando trigger de scraping para URL key: diario_oficial
+2025-06-09 17:08:39,975 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:08:39,975 - INFO - Cargando la página para URL : diario_oficial
+2025-06-09 17:08:39,975 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 17:08:43,370 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 17:13:30,685 - INFO - Iniciando Webdriver con configs.
+2025-06-09 17:13:31,292 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 17:13:31,292 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:13:31,293 - INFO - Cargando la página de sociedades
+2025-06-09 17:13:31,294 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:14:29,002 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:14:29,344 - INFO - Se encontraron 203 filas en la tabla.
+2025-06-09 17:14:29,344 - INFO - Serializando las filas...
+2025-06-09 17:14:30,446 - INFO - Se serializaron 203 registros.
+2025-06-09 17:14:30,447 - INFO - Proceso completo. Total registros: 203.
+2025-06-09 17:14:30,447 - INFO - Total registros extraídos: 203.
+2025-06-09 17:14:30,448 - INFO - Realizando validaciones previas al scraping...
+2025-06-09 17:14:30,485 - INFO - Guardando 203 registros en 'data/fiscalia_output.jsonl'...
+2025-06-09 17:14:30,494 - INFO - Se guardaron 203 registros en 'data/fiscalia_output.jsonl'.
+2025-06-09 17:14:30,494 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/fiscalia_output.jsonl
+2025-06-09 17:14:30,495 - INFO - ===> Iniciando trigger de scraping para URL key: diario_oficial
+2025-06-09 17:14:30,496 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:14:30,496 - INFO - Cargando la página de diario_oficial
+2025-06-09 17:14:30,496 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 17:14:33,585 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025
+2025-06-09 17:14:44,075 - ERROR - No hay actualizaciones en https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=08-06-2025 o la estructura ha cambiado: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//tbody"}
+  (Session info: chrome=137.0.7151.55); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+#0 0x55929e332dce <unknown>
+#1 0x55929ddd1fab <unknown>
+#2 0x55929de1c3b4 <unknown>
+#3 0x55929de1c541 <unknown>
+#4 0x55929de699f4 <unknown>
+#5 0x55929de464fd <unknown>
+#6 0x55929de67915 <unknown>
+#7 0x55929de46283 <unknown>
+#8 0x55929de100c9 <unknown>
+#9 0x55929de10e78 <unknown>
+#10 0x55929e2fef8a <unknown>
+#11 0x55929e3023de <unknown>
+#12 0x55929e301e88 <unknown>
+#13 0x55929e302875 <unknown>
+#14 0x55929e2e83bb <unknown>
+#15 0x55929e302be0 <unknown>
+#16 0x55929e2d1369 <unknown>
+#17 0x55929e3218e5 <unknown>
+#18 0x55929e321acb <unknown>
+#19 0x55929e331f45 <unknown>
+#20 0x7faf599261f5 <unknown>
+
+2025-06-09 17:14:44,075 - INFO - Se serializaron 0 registros.
+2025-06-09 17:14:44,076 - INFO - Proceso completo. Total registros: 0.
+2025-06-09 17:14:44,076 - INFO - Total registros extraídos: 0.
+2025-06-09 17:14:44,077 - INFO - Guardando 0 registros en 'data/pime_output.jsonl'...
+2025-06-09 17:14:44,080 - INFO - Se guardaron 0 registros en 'data/pime_output.jsonl'.
+2025-06-09 17:14:44,080 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/pime_output.jsonl
+2025-06-09 17:21:34,809 - INFO - Iniciando Webdriver con configs.
+2025-06-09 17:21:35,652 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 17:21:35,653 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:21:35,653 - INFO - Cargando la página de sociedades
+2025-06-09 17:21:35,654 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:23:36,589 - INFO - Iniciando Webdriver con configs.
+2025-06-09 17:23:37,075 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 17:23:37,075 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:23:37,076 - INFO - Cargando la página de sociedades
+2025-06-09 17:23:37,076 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:23:56,993 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025
+2025-06-09 17:26:44,179 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5f49af94c0>: Failed to establish a new connection: [Errno 111] Connection refused')': /session/2494137ba48c843a7356176bcfe3922d
+2025-06-09 17:26:44,180 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5f49af9d00>: Failed to establish a new connection: [Errno 111] Connection refused')': /session/2494137ba48c843a7356176bcfe3922d
+2025-06-09 17:26:44,181 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5f49af9a90>: Failed to establish a new connection: [Errno 111] Connection refused')': /session/2494137ba48c843a7356176bcfe3922d
+2025-06-09 17:27:03,659 - INFO - Iniciando Webdriver con configs.
+2025-06-09 17:27:04,481 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-09 17:27:04,482 - INFO - Iniciando proceso de scraping.
+2025-06-09 17:27:04,482 - INFO - Cargando la página de sociedades
+2025-06-09 17:27:04,482 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=08-06-2025

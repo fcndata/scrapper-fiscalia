@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from pathlib import Path
-import datetime
+from datetime import datetime
 from typing import Optional
 import time
 
@@ -12,8 +12,8 @@ class CompanyMetadata(BaseModel):
     actuacion: str
     nro_atencion: Optional[str]
     cve: str
-    fecha: datetime = Field(default_factory=datetime.datetime.now)
-    fecha_actuacion: datetime.datetime
+    fecha: datetime = Field(default_factory=datetime.now)
+    fecha_actuacion: datetime
 
     class Config:
         arbitrary_types_allowed = True

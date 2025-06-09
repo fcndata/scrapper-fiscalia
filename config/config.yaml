@@ -4,8 +4,8 @@ scraper:
   timeout_seconds: 10
 
 urls: 
-  url_1: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=
-  url_2: https://otra-pagina.cl
+  sociedades: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=
+  diario_oficial: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=
   
 output:
   log_file: logs/failed_uploads.csv
