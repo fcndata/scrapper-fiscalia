@@ -236,7 +236,7 @@ class SociedadScraper(BaseScraper):
 
             # Construcción del objeto
             obj = CompanyMetadata(
-                rut=cols[2],
+                rut=cols[2].replace('.',''),
                 razon_social=cols[4],
                 url=self.driver.current_url,
                 actuacion=cols[1],

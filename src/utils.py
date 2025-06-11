@@ -57,6 +57,6 @@ def extract_metadata(row):
     
     cve = match.group(1) if match else None
 
-    return rut.replace('*',''), razon_social, url_pdf, cve
+    return rut.replace('*','').replace('.',''), razon_social, url_pdf, cve
     
 

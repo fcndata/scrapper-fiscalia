@@ -1,0 +1,60 @@
+2025-06-11 18:03:43,909 - INFO - Iniciando Webdriver con configs.
+2025-06-11 18:03:46,672 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-11 18:03:46,672 - INFO - Iniciando proceso de scraping.
+2025-06-11 18:03:46,673 - INFO - Cargando la página de sociedades
+2025-06-11 18:03:46,673 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=10-06-2025
+2025-06-11 18:04:15,238 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=10-06-2025
+2025-06-11 18:04:18,003 - INFO - Se encontraron 936 filas en la tabla.
+2025-06-11 18:04:18,003 - INFO - Serializando las filas...
+2025-06-11 18:04:23,170 - INFO - Se serializaron 936 registros.
+2025-06-11 18:04:23,170 - INFO - Proceso completo. Total registros: 936.
+2025-06-11 18:04:23,170 - INFO - Total registros extraídos: 936.
+2025-06-11 18:04:23,171 - INFO - Realizando validaciones previas al scraping...
+2025-06-11 18:04:23,209 - INFO - Guardando 936 registros en 'data/fiscalia_output.jsonl'...
+2025-06-11 18:04:23,242 - INFO - Se guardaron 936 registros en 'data/fiscalia_output.jsonl'.
+2025-06-11 18:04:23,242 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/fiscalia_output.jsonl
+2025-06-11 18:04:23,243 - INFO - ===> Iniciando trigger de scraping para URL key: diario_oficial
+2025-06-11 18:04:23,243 - INFO - Iniciando proceso de scraping.
+2025-06-11 18:04:23,243 - INFO - Cargando la página de diario_oficial
+2025-06-11 18:04:23,244 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=10-06-2025
+2025-06-11 18:04:28,406 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=10-06-2025&edition=44170
+2025-06-11 18:04:32,350 - INFO - Se encontraron 36 filas en la tabla.
+2025-06-11 18:04:32,354 - INFO - Actualizando actuación: 'CONSTITUCIÓN - 10'
+2025-06-11 18:04:32,354 - INFO - Actualizando actuación: 'MODIFICACIÓN - 12'
+2025-06-11 18:04:32,354 - INFO - Actualizando actuación: 'MIGRACIÓN - 1'
+2025-06-11 18:04:32,355 - INFO - Se serializaron 23 registros.
+2025-06-11 18:04:32,355 - INFO - Proceso completo. Total registros: 23.
+2025-06-11 18:04:32,356 - INFO - Total registros extraídos: 23.
+2025-06-11 18:04:32,356 - INFO - Guardando 23 registros en 'data/pime_output.jsonl'...
+2025-06-11 18:04:32,360 - INFO - Se guardaron 23 registros en 'data/pime_output.jsonl'.
+2025-06-11 18:04:32,361 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/pime_output.jsonl
+2025-06-11 19:08:21,752 - INFO - Iniciando Webdriver con configs.
+2025-06-11 19:08:24,501 - INFO - ===> Iniciando trigger de scraping para URL key: sociedades
+2025-06-11 19:08:24,502 - INFO - Iniciando proceso de scraping.
+2025-06-11 19:08:24,502 - INFO - Cargando la página de sociedades
+2025-06-11 19:08:24,503 - INFO - URL dinámica construida: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=10-06-2025
+2025-06-11 19:08:38,822 - INFO - Extrayendo filas de la tabla... https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=10-06-2025
+2025-06-11 19:08:39,930 - INFO - Se encontraron 938 filas en la tabla.
+2025-06-11 19:08:39,930 - INFO - Serializando las filas...
+2025-06-11 19:08:44,542 - INFO - Se serializaron 938 registros.
+2025-06-11 19:08:44,543 - INFO - Proceso completo. Total registros: 938.
+2025-06-11 19:08:44,543 - INFO - Total registros extraídos: 938.
+2025-06-11 19:08:44,543 - INFO - Realizando validaciones previas al scraping...
+2025-06-11 19:08:44,583 - INFO - Guardando 938 registros en 'data/fiscalia_output.jsonl'...
+2025-06-11 19:08:44,618 - INFO - Se guardaron 938 registros en 'data/fiscalia_output.jsonl'.
+2025-06-11 19:08:44,618 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/fiscalia_output.jsonl
+2025-06-11 19:08:44,619 - INFO - ===> Iniciando trigger de scraping para URL key: diario_oficial
+2025-06-11 19:08:44,619 - INFO - Iniciando proceso de scraping.
+2025-06-11 19:08:44,620 - INFO - Cargando la página de diario_oficial
+2025-06-11 19:08:44,620 - INFO - URL dinámica construida: https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=10-06-2025
+2025-06-11 19:08:46,331 - INFO - Extrayendo filas de la tabla... https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=10-06-2025&edition=44170
+2025-06-11 19:08:47,790 - INFO - Se encontraron 36 filas en la tabla.
+2025-06-11 19:08:47,794 - INFO - Actualizando actuación: 'CONSTITUCIÓN - 10'
+2025-06-11 19:08:47,795 - INFO - Actualizando actuación: 'MODIFICACIÓN - 12'
+2025-06-11 19:08:47,795 - INFO - Actualizando actuación: 'MIGRACIÓN - 1'
+2025-06-11 19:08:47,796 - INFO - Se serializaron 23 registros.
+2025-06-11 19:08:47,796 - INFO - Proceso completo. Total registros: 23.
+2025-06-11 19:08:47,796 - INFO - Total registros extraídos: 23.
+2025-06-11 19:08:47,797 - INFO - Guardando 23 registros en 'data/pime_output.jsonl'...
+2025-06-11 19:08:47,801 - INFO - Se guardaron 23 registros en 'data/pime_output.jsonl'.
+2025-06-11 19:08:47,801 - INFO -  Trigger finalizado con éxito. Archivo guardado: data/pime_output.jsonl
