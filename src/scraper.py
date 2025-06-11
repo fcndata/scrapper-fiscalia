@@ -9,6 +9,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import os
 import json
 import logging
@@ -192,7 +195,7 @@ class BaseScraper:
         else:
             self.logger.warning("Webdriver no estaba inicializado. Nada que cerrar.")
 
-class FiscaliaScraper(BaseScraper):
+class SociedadScraper(BaseScraper):
     def extract_data(self) -> list:
         """    Extrae las filas de la tabla (TRs).    """
         self.logger.info(f"Extrayendo filas de la tabla... {self.driver.current_url}")
@@ -266,23 +269,29 @@ class FiscaliaScraper(BaseScraper):
 
             return False
 
-class PimeScraper(BaseScraper):
+class DiarioScraper(BaseScraper):
+    
     def extract_data(self) -> list:
         """
         Extrae todas las secciones <section class="norma_general"> directamente de la página principal.
         """
         self.logger.info(f"Extrayendo filas de la tabla... {self.driver.current_url}")
+        
+        if "select_edition" in self.driver.current_url:
+                WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, '//a[contains(@href, "index.php?date=")]'))).click()
 
         try:
             # Expandir tabla
-            self.driver.find_element(By.XPATH, '//a[contains(@href, "empresas_cooperativas.php")]').click()
+            WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//a[contains(@href, "empresas_cooperativas.php")]'))).click()
 
-            # 1️⃣ Verificar si existe <p class="nofound">
+            # Verificar si existe <p class="nofound">
             soup_page = BeautifulSoup(self.driver.page_source, 'html.parser')
             nofound = soup_page.find('p', class_='nofound')
             if nofound:
                 self.logger.info(f" No hay publicaciones para esta edición ({self.driver.current_url}): '{nofound.text.strip()}'")
-                return []
+                return []   
 
             # 2️⃣ Si hay publicaciones → obtener tbody
             html = self.driver.find_element(By.XPATH, "//tbody").get_attribute('outerHTML')
@@ -296,12 +305,12 @@ class PimeScraper(BaseScraper):
 
         except Exception as e:
             self.logger.error(f" Error inesperado en {self.driver.current_url}: {e}")
-            raise ValueError(f"No se pudo extraer la tabla de sociedades cooperativas en {self.driver.current_url}.")**
+            raise ValueError(f"No se pudo extraer la tabla de sociedades cooperativas en {self.driver.current_url}.")
 
     def extract_serialization(self, rows) -> list[CompanyMetadata]:
         data_objects = []
         current_actuacion = None  # Contexto que vamos actualizando
-        register_count = 0
+        actuacion_counter = {}
 
         for row in rows:
             # Caso 1️⃣ → Es fila "contextual" → revisar si hay title3
@@ -309,7 +318,8 @@ class PimeScraper(BaseScraper):
                 td_title3 = row.find('td', class_='title3')
                 if td_title3:
                     current_actuacion = td_title3.text.strip()
-                    self.logger.info(f"Actualizando actuacion: '{current_actuacion} - {register_count} '")
+                    if current_actuacion not in actuacion_counter.keys():
+                        actuacion_counter[current_actuacion] = 0
 
             # Caso 2️⃣ → Es fila de contenido
             elif 'content' in row.get('class', []):
@@ -328,7 +338,11 @@ class PimeScraper(BaseScraper):
 
                 data_objects.append(obj)
 
-                register_count += 1
+                if current_actuacion:
+                    actuacion_counter[current_actuacion] += 1
+
+        for act, count in actuacion_counter.items():
+            self.logger.info(f"Actualizando actuación: '{act} - {count}'")
 
         self.logger.info(f"Se serializaron {len(data_objects)} registros.")
         return data_objects

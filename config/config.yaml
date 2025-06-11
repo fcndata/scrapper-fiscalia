@@ -5,7 +5,7 @@ scraper:
 
 urls: 
   sociedades: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=
-  diario_oficial: https://www.diariooficial.interior.gob.cl/edicionelectronica/empresas_cooperativas.php?date=
+  diario_oficial: https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=
   
 output:
   log_file: logs/failed_uploads.csv

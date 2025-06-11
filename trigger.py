@@ -1,4 +1,4 @@
-from src.scraper import FiscaliaScraper, PimeScraper, BrowserSession
+from src.scraper import DiarioScraper, SociedadScraper, BrowserSession
 from config.config_loader import Config
 
 def main():
@@ -10,12 +10,12 @@ def main():
 
     try:
         #  FiscaliaScraper
-        fiscalia_scraper = FiscaliaScraper(driver, config)
+        fiscalia_scraper = SociedadScraper(driver, config)
         fiscalia_scraper.trigger("sociedades", output_path="data/fiscalia_output.jsonl")
         print("Extracción de modificaciones de sociedades se ejecutó correctamente.")
 
         #  PimeScraper
-        pime_scraper = PimeScraper(driver, config)
+        pime_scraper = DiarioScraper(driver, config)
         pime_scraper.trigger("diario_oficial", output_path="data/pime_output.jsonl")
         print("Extracción de modificaciones de diario_oficial se ejecutó correctamente.")
 
