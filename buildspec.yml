@@ -3,22 +3,18 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo "→ Autenticando en ECR..."
-      - aws ecr get-login-password \
-          --region us-east-1 \
-        | docker login \
-          --username AWS \
-          --password-stdin 272416989303.dkr.ecr.us-east-1.amazonaws.com
+      - echo "🔑 Autenticando en ECR..."
+      - |
+        aws ecr get-login-password --region us-east-1 \
+        | docker login --username AWS --password-stdin 272416989303.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
-      - echo "→ Construyendo imagen Docker..."
+      - echo "🐳 Construyendo imagen Docker..."
       - docker build -t scraper-fiscalia .
-      - docker tag \
-          scraper-fiscalia:latest \
-          272416989303.dkr.ecr.us-east-1.amazonaws.com/scraper-fiscalia:latest
+      - docker tag scraper-fiscalia:latest 272416989303.dkr.ecr.us-east-1.amazonaws.com/scraper-fiscalia:latest
   post_build:
     commands:
-      - echo "→ Empujando imagen a ECR..."
+      - echo "🚀 Pushing imagen a ECR..."
       - docker push 272416989303.dkr.ecr.us-east-1.amazonaws.com/scraper-fiscalia:latest
 
 artifacts:
