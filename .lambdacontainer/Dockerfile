@@ -1,10 +1,15 @@
-FROM public.ecr.aws/lambda/python:3.10
+# 1️⃣ Partimos de Amazon Linux 2 puro
+FROM amazonlinux:2
 
-# Install Chromium and Chromedriver on Amazon Linux 2
-RUN yum update -y \
-    && yum install -y \
-       chromium \
-       chromedriver \
+# 2️⃣ Instalar Python3, pip y el Lambda Runtime Interface Client
+RUN yum install -y python3 python3-pip zip \
+    && pip3 install --upgrade pip awslambdaric \
+    && yum clean all
+
+# 3️⃣ Habilitar EPEL para Chromium
+RUN yum install -y epel-release \
+    && yum clean metadata \
+    && yum install -y chromium chromium-headless chromedriver \
     && yum clean all \
     && rm -rf /var/cache/yum
 
