@@ -10,7 +10,7 @@ phases:
   build:
     commands:
       - echo "🐳 Construyendo imagen Docker..."
-      - docker build -f .devcontainer/Dockerfile -t scraper-fiscalia .
+      - docker build -f .lambdacontainer/Dockerfile -t scraper-fiscalia .
       - docker tag scraper-fiscalia:latest 272416989303.dkr.ecr.us-east-1.amazonaws.com/scraper-fiscalia:latest
   post_build:
     commands:

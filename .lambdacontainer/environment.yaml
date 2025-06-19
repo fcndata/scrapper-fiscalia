@@ -1,0 +1,11 @@
+name: scraper-fiscalia
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - selenium
+      - pydantic
+      - pandas
+      - beautifulsoup4
+      - lxml
+      - yaml
