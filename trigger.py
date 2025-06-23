@@ -1,7 +1,6 @@
 from src.scraper import DiarioScraper, SociedadScraper, BrowserSession
 from config.config_loader import Config
 from src.utils import return_metadata
-from slee
 
 def main():
     config = Config()
@@ -31,11 +30,7 @@ def main():
     
     
     df = return_metadata()
-    print (df)
     return df
-    
-    
-
 
 if __name__ == "__main__":
     main()

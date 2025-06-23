@@ -19,6 +19,9 @@ venv/
 # Logs y archivos de texto generados
 logs/*.txt
 *.log
+diario_scraper.jsonl
+empresa_scraper.jsonl
+
 
 # --------
 # Carpetas de salida / build
