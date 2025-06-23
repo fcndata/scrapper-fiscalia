@@ -1,7 +1,38 @@
-# VSCode
+# --------
+# IDEs / Editores
 .vscode/
-#Logs
-./logs/*.txt
-#Cache
-__pycache__/
+.idea/
 
+# --------
+# Python byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --------
+# Entornos virtuales
+venv/
+.env/
+.env.*         # si usas múltiples .env por entorno
+
+# --------
+# Logs y archivos de texto generados
+logs/*.txt
+*.log
+
+# --------
+# Carpetas de salida / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --------
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# --------
+# Pip cache (si lo guardas local)
+pip-log.txt
+pip-delete-this-directory.txt

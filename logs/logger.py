@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Log directory
-LOG_DIR = Path(__file__).parent
+LOG_DIR = Path("/tmp/logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Log file name
