@@ -8,6 +8,8 @@ urls:
   diario_oficial: https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=
   
 output:
+  sociedades: data/empresa_scraper.jsonl
+  diario_oficial: data/diario_scraper.jsonl
   log_file: logs/failed_uploads.csv
   json_output_folder: data/output
 

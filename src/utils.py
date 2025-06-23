@@ -1,6 +1,9 @@
 from datetime import datetime,timedelta
 import re
 from config.config_loader import Config
+from pathlib import Path
+import pandas as pd
+from src.models import CompanyMetadata
 
 def get_url_scrape(config: Config, url_key: str) -> str:
     """
@@ -59,4 +62,33 @@ def extract_metadata(row):
 
     return rut.replace('*','').replace('.',''), razon_social, url_pdf, cve
     
+def return_metadata() -> pd.DataFrame:
+    """
+    Lee los archivos JSONL de 'diario_scraper' y 'empresa_scraper',
+    parsea cada línea a CompanyMetadata y devuelve un DataFrame.
+    """
+    paths = [
+        Path("data/diario_scraper.jsonl"),
+        Path("data/empresa_scraper.jsonl"),
+    ]
 
+    registros = []
+    for p in paths:
+        if not p.exists():
+            raise FileNotFoundError(f"No se encontró el archivo {p}")
+        with p.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    # parse_raw acepta directamente la línea JSON
+                    modelo = CompanyMetadata.parse_raw(line)
+                    registros.append(modelo.dict())
+                except Exception as e:
+                    # Aquí podrías loguear o recolectar errores de parsing
+                    print(f"[Warning] Falló parseo en {p}: {e}")
+
+    # Convertimos la lista de dicts a DataFrame
+    df = pd.DataFrame.from_records(registros)
+    return df

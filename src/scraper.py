@@ -277,9 +277,17 @@ class DiarioScraper(BaseScraper):
         """
         self.logger.info(f"Extrayendo filas de la tabla... {self.driver.current_url}")
         
+        soup_page = BeautifulSoup(self.driver.page_source, 'html.parser')
+        nofound = soup_page.find('p', class_='nofound')
+        
+        if nofound:
+            self.logger.info(f" No hay publicaciones para esta edición ({self.driver.current_url}): '{nofound.text.strip()}'")
+            return [] 
+
         if "select_edition" in self.driver.current_url:
                 WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, '//a[contains(@href, "index.php?date=")]'))).click()
+                print ('ingreso a select_edition')
 
         try:
             # Expandir tabla
@@ -287,11 +295,7 @@ class DiarioScraper(BaseScraper):
             EC.element_to_be_clickable((By.XPATH, '//a[contains(@href, "empresas_cooperativas.php")]'))).click()
 
             # Verificar si existe <p class="nofound">
-            soup_page = BeautifulSoup(self.driver.page_source, 'html.parser')
-            nofound = soup_page.find('p', class_='nofound')
-            if nofound:
-                self.logger.info(f" No hay publicaciones para esta edición ({self.driver.current_url}): '{nofound.text.strip()}'")
-                return []   
+              
 
             # 2️⃣ Si hay publicaciones → obtener tbody
             html = self.driver.find_element(By.XPATH, "//tbody").get_attribute('outerHTML')
