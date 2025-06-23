@@ -16,13 +16,11 @@ RUN curl -Lo "/tmp/chromedriver-linux64.zip" "https://storage.googleapis.com/chr
 # Asigna permisos al driver y chrome
 RUN chmod 777 ./chromedriver-linux64/chromedriver
 RUN chmod 777 ./chrome-headless-shell-linux64/chrome-headless-shell
- 
-# Instalar selenium, numpy, pandas, pyarrow
-RUN pip install selenium && pip install numpy && pip install pandas && pip install pyarrow
- 
-# Instala pyvirtualdisplay para ejecutar aplicaciones gráficas como navegadores web en sistemas sin un servidor
-RUN pip install pyvirtualdisplay
- 
+
+# Instala pip y las dependencias de Python
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
 # Copiar el código de la función lambda
 COPY . .
  

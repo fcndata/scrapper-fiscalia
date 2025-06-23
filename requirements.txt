@@ -1,6 +1,8 @@
 selenium
 pydantic
+pyvirtualdisplay
 pandas
+pyarrow
 beautifulsoup4
 lxml
 pyyaml
