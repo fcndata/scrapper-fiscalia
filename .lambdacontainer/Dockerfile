@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AWS provee imágenes base que ya incluyen el Runtime Interface Client (RIC) necesario para que Lambda se comunique con tu contenedor.
 FROM public.ecr.aws/lambda/python:3.10
 
@@ -9,6 +10,22 @@ RUN yum install -y \
       mesa-libgbm libpango1.0-0 libglib2.0-0 wget libcups2 libgbm1 libdrm2 ca-certificates xdg-utils \
       liberation-fonts vulkan && \
     yum clean all
+=======
+# 1️⃣ Partimos de Amazon Linux 2 puro
+FROM amazonlinux:2
+
+# 2️⃣ Instalar Python3, pip y el Lambda Runtime Interface Client
+RUN yum install -y python3 python3-pip zip \
+    && pip3 install --upgrade pip awslambdaric \
+    && yum clean all
+
+# 3️⃣ Habilitar EPEL para Chromium
+RUN yum install -y epel-release \
+    && yum clean metadata \
+    && yum install -y chromium chromium-headless chromedriver \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+>>>>>>> origin/feature/cloud_base
 
 # 2️⃣ Descargar Chrome headless y Chromedriver, y asignar permisos
 RUN curl -Lo /tmp/chromedriver-linux64.zip \
@@ -30,12 +47,12 @@ ENV CHROME_BIN=/usr/bin/chromium-browser \
 WORKDIR ${LAMBDA_TASK_ROOT}
 
 # Copy and install Python dependencies
-COPY .lambdacontainer/requirements.txt  .
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+COPY requirements.txt ${LAMBDA_TASK_ROOT}/
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
 
-# Copy application code (including trigger.py, src/, config/, lambda_handler.py)
-COPY . .
+# 5️⃣ Copiar código de la aplicación
+COPY . ${LAMBDA_TASK_ROOT}/
 
 # Define the Lambda handler entry point
 # Assumes you have created lambda_handler.py with a function named lambda_handler
