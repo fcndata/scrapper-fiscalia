@@ -13,21 +13,26 @@ RUN curl -Lo "/tmp/chromedriver-linux64.zip" "https://storage.googleapis.com/chr
     unzip /tmp/chromedriver-linux64.zip -d ./ && \
     unzip /tmp/chrome-headless-shell-linux64.zip -d ./
 
-# Define las variables de entorno para ubicar chrome y chromedriver
-ENV CHROME_BIN=/var/task/chrome-headless-shell-linux64/chrome-headless-shell
-ENV CHROMEDRIVER_BIN=/var/task/chromedriver-linux64/chromedriver
-
-# Asigna permisos al driver y chrome
-RUN chmod 777 ./chromedriver-linux64/chromedriver
-RUN chmod 777 ./chrome-headless-shell-linux64/chrome-headless-shell
+# Working directory
+WORKDIR /app
 
 # Instala pip y las dependencias de Python
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copiar el código de la función lambda
+# Copiar el código fuente al contenedor
 COPY . .
- 
+
+# Define las variables de entorno para ubicar chrome y chromedriver
+ENV CHROME_BIN=/app/chrome-headless-shell-linux64/chrome-headless-shell
+ENV CHROMEDRIVER_BIN=/app/chromedriver-linux64/chromedriver
+
+
+# Asigna permisos al driver y chrome
+RUN chmod 777 ./chromedriver-linux64/chromedriver
+RUN chmod 777 ./chrome-headless-shell-linux64/chrome-headless-shell
+
+
 # Imprime en pantalla
 RUN ls -l ./
 RUN ls -l ./chrome-headless-shell-linux64
