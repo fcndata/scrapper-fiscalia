@@ -1,4 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.9
+
+# Working directory
+WORKDIR /app
  
 # Instalar dependencias
 RUN yum install -y atk cups-libs gtk3 libXcomposite alsa-lib libX11 libxi6 libxtst6 libnss3 fonts-liberation unzip libxdamage1 gtk3-devel \
@@ -12,9 +15,6 @@ RUN curl -Lo "/tmp/chromedriver-linux64.zip" "https://storage.googleapis.com/chr
     curl -Lo "/tmp/chrome-headless-shell-linux64.zip" "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.93/linux64/chrome-headless-shell-linux64.zip" && \
     unzip /tmp/chromedriver-linux64.zip -d ./ && \
     unzip /tmp/chrome-headless-shell-linux64.zip -d ./
-
-# Working directory
-WORKDIR /app
 
 # Instala pip y las dependencias de Python
 COPY requirements.txt .
