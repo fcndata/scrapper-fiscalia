@@ -30,4 +30,4 @@ RUN ls -l ./chrome-headless-shell-linux64
 RUN ls -l ./chromedriver-linux64
  
 # Establecer el punto de entrada
-CMD ["src.lambda.lambda_handler"]
+CMD ["trigger.lambda_handler"]

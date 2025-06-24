@@ -1,5 +1,5 @@
 import json
-from trigger import main
+from ..trigger import main
 from logs.logger import logger
 
 
