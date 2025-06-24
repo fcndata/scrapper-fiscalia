@@ -38,19 +38,23 @@ def main():
 def lambda_handler(event, context) -> dict:
     try:
         df = main()
-        # Tomamos la primera fila como lista de dicts
+        logger.debug("DataFrame generado, columnas: %s", df.columns.tolist())
+
         payload = (
-                    df.head(1)
+                    df.head(8)
                     .astype(str)  # convierte todos los valores a su representación de texto
                     .to_dict(orient="records"))
-        
-        logger.info("Response: %s", json.dumps(payload))
 
-        return {
+        logger.info("Payload listo: %s", payload)
+
+        response = {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(payload)
         }
+        logger.debug("Response completa: %s", response)
+
+        return response
 
 
     except Exception as e:
