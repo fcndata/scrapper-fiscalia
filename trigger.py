@@ -1,6 +1,8 @@
 from src.scraper import DiarioScraper, SociedadScraper, BrowserSession
+from logs.logger import logger
 from config.config_loader import Config
 from src.utils import return_metadata
+import json
 
 def main():
     config = Config()
@@ -13,20 +15,20 @@ def main():
         #  FiscaliaScraper
         fiscalia_scraper = SociedadScraper(driver, config)
         fiscalia_scraper.trigger("sociedades", output_path=config.get("output.sociedades"))
-        print("Extracción de modificaciones de sociedades se ejecutó correctamente.")
+        logger.exception("Extracción de modificaciones de sociedades se ejecutó correctamente.")
 
         #  PimeScraper
         diario_scraper = DiarioScraper(driver, config)
         diario_scraper.trigger("diario_oficial", output_path=config.get("output.diario_oficial"))
-        print("Extracción de modificaciones de diario_oficial se ejecutó correctamente.")
+        logger.exception("Extracción de modificaciones de diario_oficial se ejecutó correctamente.")
 
     except Exception as e:
-        print(f" Error general: {e}")
+        logger.exception(f" Error general: {e}")
 
     finally:
         # ⚠️ Cerramos el driver SOLO AL FINAL
         driver.quit()
-        print(" Driver cerrado correctamente.")
+        logger.exception(" Driver cerrado correctamente.")
     
     
     df = return_metadata()
@@ -42,11 +44,7 @@ def lambda_handler(event, context) -> dict:
                     .astype(str)  # convierte todos los valores a su representación de texto
                     .to_dict(orient="records"))
         
-        print ({
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(payload)
-        })
+        logger.info("Response: %s", json.dumps(payload))
 
         return {
             "statusCode": 200,
@@ -65,7 +63,5 @@ def lambda_handler(event, context) -> dict:
 
 
 if __name__ == "__main__":
-    test_event = {}
-    test_context = None
-    lambda_handler(test_event,test_context)
-
+    resp = lambda_handler({}, None)
+    print(json.dumps(resp, indent=2))
