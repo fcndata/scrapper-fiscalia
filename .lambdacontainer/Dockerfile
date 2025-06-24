@@ -21,11 +21,11 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copiar el código fuente al contenedor
-COPY config/
-COPY data/
-COPY logs/
-COPY src/
-COPY trigger.py
+COPY config/    /app/config/
+COPY data/      /app/data/
+COPY logs/      /app/logs/
+COPY src/       /app/src/
+COPY trigger.py /app/trigger.py
 
 
 # Define las variables de entorno para ubicar chrome y chromedriver
