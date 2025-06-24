@@ -12,7 +12,11 @@ RUN curl -Lo "/tmp/chromedriver-linux64.zip" "https://storage.googleapis.com/chr
     curl -Lo "/tmp/chrome-headless-shell-linux64.zip" "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.93/linux64/chrome-headless-shell-linux64.zip" && \
     unzip /tmp/chromedriver-linux64.zip -d ./ && \
     unzip /tmp/chrome-headless-shell-linux64.zip -d ./
- 
+
+# Define las variables de entorno para ubicar chrome y chromedriver
+ENV CHROME_BIN=/var/task/chrome-headless-shell-linux64/chrome-headless-shell
+ENV CHROMEDRIVER_BIN=/var/task/chromedriver-linux64/chromedriver
+
 # Asigna permisos al driver y chrome
 RUN chmod 777 ./chromedriver-linux64/chromedriver
 RUN chmod 777 ./chrome-headless-shell-linux64/chrome-headless-shell
