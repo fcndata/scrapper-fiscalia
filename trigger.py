@@ -35,37 +35,5 @@ def main():
     return df
 
 
-def lambda_handler(event, context) -> dict:
-    try:
-        df = main()
-        logger.debug("DataFrame generado, columnas: %s", df.columns.tolist())
-
-        payload = (
-                    df.head(8)
-                    .astype(str)  # convierte todos los valores a su representación de texto
-                    .to_dict(orient="records"))
-
-        logger.info("Payload listo: %s", payload)
-
-        response = {
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(payload)
-        }
-        logger.debug("Response completa: %s", response)
-
-        return response
-
-
-    except Exception as e:
-        logger.exception("Error en lambda_handler")
-        return {
-            "statusCode": 500,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"error": str(e)})
-        }
-
-
 if __name__ == "__main__":
-    resp = lambda_handler({}, None)
-    print(json.dumps(resp, indent=2))
+    main()

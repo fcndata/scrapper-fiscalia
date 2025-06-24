@@ -21,7 +21,12 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copiar el código fuente al contenedor
-COPY . .
+COPY config/
+COPY data/
+COPY logs/
+COPY src/
+COPY trigger.py
+
 
 # Define las variables de entorno para ubicar chrome y chromedriver
 ENV CHROME_BIN=/app/chrome-headless-shell-linux64/chrome-headless-shell
@@ -39,4 +44,4 @@ RUN ls -l ./chrome-headless-shell-linux64
 RUN ls -l ./chromedriver-linux64
  
 # Establecer el punto de entrada
-CMD ["trigger.lambda_handler"]
+CMD ["src.lambda.lambda_handler"]
