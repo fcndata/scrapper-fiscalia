@@ -3,6 +3,7 @@ import re
 from config.config_loader import Config
 from pathlib import Path
 import pandas as pd
+import json
 from src.models import CompanyMetadata
 
 def get_url_scrape(config: Config, url_key: str) -> str:
@@ -82,8 +83,7 @@ def return_metadata() -> pd.DataFrame:
                 if not line:
                     continue
                 try:
-                    # parse_obj es más moderno y claro
-                    import json
+
                     modelo = CompanyMetadata.parse_obj(json.loads(line))
                     registros.append(modelo.dict())
                 except Exception as e:
