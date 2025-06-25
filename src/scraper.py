@@ -124,13 +124,17 @@ class BaseScraper:
         Cada línea del archivo es un JSON individual.
         """
         self.logger.info(f"Guardando {len(data_objects)} registros en '{output_path}'...")
+        
+        # Asegurar que el directorio existe (útil para desarrollo local y otras rutas)
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, "a", encoding="utf-8") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             for obj in data_objects:
                 json_line = json.dumps(obj.serialize(), ensure_ascii=False)
                 f.write(json_line + "\n")
 
         self.logger.info(f"Se guardaron {len(data_objects)} registros en '{output_path}'.")
+        self.logger.info(f"Archivo creado: {Path(output_path).exists()}")
     
     def run(self, url_key: str) -> list[CompanyMetadata]:
         """

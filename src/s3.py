@@ -30,6 +30,9 @@ class S3Manager:
         uploaded_files = []
         jsonl_files = list(Path("/tmp").glob("*.jsonl"))
         
+        logger.info(f"Bucket: {self.bucket_name}, Base path: {self.s3_base_path}")
+        logger.info(f"Found {len(jsonl_files)} JSONL files: {[f.name for f in jsonl_files]}")
+        
         for jsonl_file in jsonl_files:
             try:
                 # Convertir JSONL a Parquet usando utils
