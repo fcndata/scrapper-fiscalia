@@ -82,8 +82,9 @@ def return_metadata() -> pd.DataFrame:
                 if not line:
                     continue
                 try:
-                    # parse_raw acepta directamente la línea JSON
-                    modelo = CompanyMetadata.parse_raw(line)
+                    # parse_obj es más moderno y claro
+                    import json
+                    modelo = CompanyMetadata.parse_obj(json.loads(line))
                     registros.append(modelo.dict())
                 except Exception as e:
                     # Aquí podrías loguear o recolectar errores de parsing

@@ -15,12 +15,12 @@ def main():
         #  FiscaliaScraper
         fiscalia_scraper = SociedadScraper(driver, config)
         fiscalia_scraper.trigger("sociedades", output_path=config.get("output.sociedades"))
-        logger.exception("Extracción de modificaciones de sociedades se ejecutó correctamente.")
+        logger.info("Extracción de modificaciones de sociedades se ejecutó correctamente.")
 
         #  PimeScraper
         diario_scraper = DiarioScraper(driver, config)
         diario_scraper.trigger("diario_oficial", output_path=config.get("output.diario_oficial"))
-        logger.exception("Extracción de modificaciones de diario_oficial se ejecutó correctamente.")
+        logger.info("Extracción de modificaciones de diario_oficial se ejecutó correctamente.")
 
     except Exception as e:
         logger.exception(f" Error general: {e}")
@@ -28,7 +28,7 @@ def main():
     finally:
         # ⚠️ Cerramos el driver SOLO AL FINAL
         driver.quit()
-        logger.exception(" Driver cerrado correctamente.")
+        logger.info(" Driver cerrado correctamente.")
     
     
     df = return_metadata()

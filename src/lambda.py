@@ -1,5 +1,5 @@
 import json
-from ..trigger import main
+from trigger import main
 from logs.logger import logger
 
 def lambda_handler(event, context) -> dict:
@@ -8,7 +8,7 @@ def lambda_handler(event, context) -> dict:
         logger.debug("DataFrame generado, columnas: %s", df.columns.tolist())
         payload = (
                     df.head(8)
-                    .astype(str)  # convierte todos los valores a su representación de texto
+                    .astype(str)
                     .to_dict(orient="records"))
 
         logger.info("Payload listo: %s", payload)
