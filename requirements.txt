@@ -6,4 +6,3 @@ pyarrow
 beautifulsoup4
 lxml
 pyyaml
-boto3

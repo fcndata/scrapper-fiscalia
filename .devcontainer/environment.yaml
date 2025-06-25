@@ -9,3 +9,4 @@ dependencies:
       - beautifulsoup4
       - lxml
       - yaml
+      - boto3
