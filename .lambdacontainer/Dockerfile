@@ -1,7 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.9
 
-# Working directory
-WORKDIR /app
+# Working directory (usar el directorio por defecto de Lambda)
+WORKDIR /var/task
  
 # Instalar dependencias
 RUN yum install -y atk cups-libs gtk3 libXcomposite alsa-lib libX11 libxi6 libxtst6 libnss3 fonts-liberation unzip libxdamage1 gtk3-devel \
@@ -30,8 +30,8 @@ COPY trigger.py ./trigger.py
 
 
 # Define las variables de entorno para ubicar chrome y chromedriver
-ENV CHROME_BIN=/app/chrome-headless-shell-linux64/chrome-headless-shell
-ENV CHROMEDRIVER_BIN=/app/chromedriver-linux64/chromedriver
+ENV CHROME_BIN=/var/task/chrome-headless-shell-linux64/chrome-headless-shell
+ENV CHROMEDRIVER_BIN=/var/task/chromedriver-linux64/chromedriver
 
 
 # Asigna permisos al driver y chrome
