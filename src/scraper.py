@@ -1,4 +1,4 @@
-from config.config_loader import Config
+from config import config
 from pydantic import Field
 from abc import abstractmethod
 from pathlib import Path
@@ -17,19 +17,17 @@ import json
 import logging
 from logs.logger import logger
 from src.models import CompanyMetadata
-from src.utils import get_url_scrape
-from src.utils import parse_total_expected
-from src.utils import get_date_update, extract_metadata
+from src.utils import get_url_scrape, parse_total_expected, get_date_update, extract_metadata
+
 
 class BrowserSession:
-    def __init__(self, config: Config ):  
-
-        self.config = config
+    def __init__(self):  
+        # Usar config global
 
         # Levantar parametros de config
-        self.headless = self.config.get("scraper.headless", True)
-        self.user_agent = self.config.get("scraper.user_agent", "Mozilla/5.0 ...")
-        self.verbose = self.config.get("scraper.verbose", False)
+        self.headless = config.get("scraper.headless", True)
+        self.user_agent = config.get("scraper.user_agent", "Mozilla/5.0 ...")
+        self.verbose = config.get("scraper.verbose", False)
 
         # Paths de binarios desde ENV
         self.chromedriver_path = Path(os.getenv("CHROMEDRIVER_BIN"))
@@ -81,9 +79,8 @@ class BrowserSession:
             logger.warning("No se pudo cerrar el Webdriver porque no estaba inicializado.")
     
 class BaseScraper:
-    def __init__(self, driver: webdriver.Chrome, config: Config, logger: logging.Logger = logger):
+    def __init__(self, driver: webdriver.Chrome, logger: logging.Logger = logger):
         self.driver = driver
-        self.config = config
         self.logger = logger
     
     def load_page(self, url: str):
@@ -91,7 +88,7 @@ class BaseScraper:
         Carga la página web en el navegador.
         """
         self.logger.info(f"Cargando la página de {url}")
-        dynamic_url = get_url_scrape(self.config, url)
+        dynamic_url = get_url_scrape(url)
         self.logger.info(f"URL dinámica construida: {dynamic_url}")
                
         self.driver.get(dynamic_url)
@@ -142,7 +139,7 @@ class BaseScraper:
         """
         self.logger.info("Iniciando proceso de scraping.")
 
-        url_base = self.config.get(f"urls.{url_key}")
+        url_base = config.get(f"urls.{url_key}")
 
         if not url_base:
             self.logger.error(f"No se encontró URL para la key: {url_key}")
@@ -167,7 +164,7 @@ class BaseScraper:
         """
         self.logger.info(f"===> Iniciando trigger de scraping para URL key: {url_key}")
 
-        url_base = self.config.get(f"urls.{url_key}")
+        url_base = config.get(f"urls.{url_key}")
 
         if not url_base:
             self.logger.error(f"No se encontró URL para la key: {url_key}")
@@ -293,7 +290,7 @@ class DiarioScraper(BaseScraper):
         if "select_edition" in self.driver.current_url:
                 WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, '//a[contains(@href, "index.php?date=")]'))).click()
-                print ('ingreso a select_edition')
+                logger.info('Ingreso a select_edition')
 
         try:
             # Expandir tabla

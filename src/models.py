@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
-from pathlib import Path
 from datetime import datetime
 from typing import Optional
-import time
 
 class CompanyMetadata(BaseModel):
     ''' Represents metadata for a company. '''

@@ -1,12 +1,13 @@
-from datetime import datetime,timedelta
 import re
-from config.config_loader import Config
-from pathlib import Path
-import pandas as pd
 import json
+import pandas as pd
+from datetime import datetime,timedelta
+from config import config
+from logs.logger import logger
+from pathlib import Path
 from src.models import CompanyMetadata
 
-def get_url_scrape(config: Config, url_key: str) -> str:
+def get_url_scrape(url_key: str) -> str:
     """
     Construye la URL dinámica en función de la clave de URL y la fecha de ayer.
     """
@@ -82,38 +83,6 @@ def jsonl_to_parquet(jsonl_path: str, parquet_path: str) -> bool:
         return True
         
     except Exception as e:
-        print(f"Error converting {jsonl_path} to parquet: {e}")
+        # Usar logger en lugar de print
+        logger.error(f"Error converting {jsonl_path} to parquet: {e}")
         return False
-
-def return_metadata() -> pd.DataFrame:
-    """
-    Lee los archivos JSONL de 'diario_scraper' y 'empresa_scraper',
-    parsea cada línea a CompanyMetadata y devuelve un DataFrame.
-    """
-    config = Config()
-    
-    paths = [
-        Path(config.get("output.diario_oficial")),
-        Path(config.get("output.sociedades")),
-    ]
-
-    registros = []
-    for p in paths:
-        if not p.exists():
-            raise FileNotFoundError(f"No se encontró el archivo {p}")
-        with p.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-
-                    modelo = CompanyMetadata.parse_obj(json.loads(line))
-                    registros.append(modelo.dict())
-                except Exception as e:
-                    # Aquí podrías loguear o recolectar errores de parsing
-                    print(f"[Warning] Falló parseo en {p}: {e}")
-
-    # Convertimos la lista de dicts a DataFrame
-    df = pd.DataFrame.from_records(registros)
-    return df

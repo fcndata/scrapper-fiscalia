@@ -2,7 +2,16 @@ from pathlib import Path
 import yaml
 
 class Config:
-    def __init__(self, config_path: Path = Path("config/config.yaml")):
+    _instance = None
+    _config = None
+    
+    def __new__(cls, config_path: Path = Path("config/config.yaml")):
+        if cls._instance is None:
+            cls._instance = super(Config, cls).__new__(cls)
+            cls._instance._load_config(config_path)
+        return cls._instance
+    
+    def _load_config(self, config_path: Path):
         self.path = Path(config_path)
         if not self.path.exists():
             raise FileNotFoundError(f"Config file not found: {self.path}")

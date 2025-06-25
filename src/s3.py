@@ -1,7 +1,7 @@
 import boto3
 from datetime import datetime
 from pathlib import Path
-from config.config_loader import Config
+from config import config
 from logs.logger import logger
 from typing import Optional
 from src.utils import jsonl_to_parquet
@@ -9,10 +9,9 @@ from src.utils import jsonl_to_parquet
 
 class S3Manager:
     def __init__(self):
-        self.config = Config()
-        self.bucket_name = self.config.get("aws.s3_bucket")
-        self.s3_base_path = self.config.get("aws.s3_name", "/scraper/fiscalia/")
-        self.region = self.config.get("aws.region", "us-east-1")
+        self.bucket_name = config.get("aws.s3_bucket")
+        self.s3_base_path = config.get("aws.s3_name", "scraper/fiscalia")
+        self.region = config.get("aws.region", "us-east-1")
         
         self.s3_client = boto3.client('s3', region_name=self.region)
     
