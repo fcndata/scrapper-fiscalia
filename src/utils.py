@@ -63,6 +63,28 @@ def extract_metadata(row):
 
     return rut.replace('*','').replace('.',''), razon_social, url_pdf, cve
     
+def jsonl_to_parquet(jsonl_path: str, parquet_path: str) -> bool:
+    """
+    Convierte un archivo JSONL a Parquet
+    """
+    try:
+        records = []
+        with open(jsonl_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    records.append(json.loads(line.strip()))
+        
+        if not records:
+            return False
+        
+        df = pd.DataFrame(records)
+        df.to_parquet(parquet_path, index=False)
+        return True
+        
+    except Exception as e:
+        print(f"Error converting {jsonl_path} to parquet: {e}")
+        return False
+
 def return_metadata() -> pd.DataFrame:
     """
     Lee los archivos JSONL de 'diario_scraper' y 'empresa_scraper',

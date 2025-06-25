@@ -31,8 +31,8 @@ def main():
         logger.info(" Driver cerrado correctamente.")
     
     
-    df = return_metadata()
-    return df
+    df = return_metadata() # to delete
+    return df # to delete
 
 
 if __name__ == "__main__":
