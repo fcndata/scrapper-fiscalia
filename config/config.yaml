@@ -15,5 +15,5 @@ output:
 
 aws:
   s3_bucket: 'v1-st-bech-inegocio-analitica-sandbox-zone'
-  s3_name: '/scraper/fiscalia/'
+  s3_name: 'scraper/fiscalia'
   region: 'us-east-1'

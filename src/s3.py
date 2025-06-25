@@ -18,10 +18,12 @@ class S3Manager:
     
     def _get_daily_path(self) -> str:
         """
-        Genera el path con la fecha del día: /scraper/fiscalia/20250125/
+        Genera el path con la fecha del día: scraper/fiscalia/20250125/
         """
         today = datetime.now()
-        return f"{self.s3_base_path.rstrip('/')}/{today.year}{today.month:02d}{today.day:02d}/"
+        # Eliminar slash inicial y final para evitar doble slash
+        clean_path = self.s3_base_path.strip('/')
+        return f"{clean_path}/{today.year}{today.month:02d}{today.day:02d}/"
     
     def upload_raw(self) -> list[str]:
         """
