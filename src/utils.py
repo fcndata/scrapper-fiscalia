@@ -68,9 +68,11 @@ def return_metadata() -> pd.DataFrame:
     Lee los archivos JSONL de 'diario_scraper' y 'empresa_scraper',
     parsea cada línea a CompanyMetadata y devuelve un DataFrame.
     """
+    config = Config()
+    
     paths = [
-        Path("data/diario_scraper.jsonl"),
-        Path("data/empresa_scraper.jsonl"),
+        Path(config.get("output.diario_oficial")),
+        Path(config.get("output.sociedades")),
     ]
 
     registros = []

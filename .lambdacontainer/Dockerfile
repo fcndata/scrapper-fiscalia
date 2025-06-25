@@ -21,8 +21,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copiar el código fuente al contenedor
-RUN mkdir -p ./data
-
 COPY config/    ./config/
 COPY logs/      ./logs/
 COPY src/       ./src/
