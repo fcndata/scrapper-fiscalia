@@ -1,9 +1,24 @@
 import json
-from trigger import main
+from typing import Dict, Any, Optional
+
 from logs.logger import logger
 from src.s3 import S3Manager
+from trigger import main
 
-def lambda_handler(event, context) -> dict:
+
+def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict[str, Any]:
+    """
+    Función principal para AWS Lambda.
+    
+    Ejecuta el proceso de scraping y sube los archivos resultantes a S3.
+    
+    Args:
+        event: Evento de AWS Lambda que activa la función.
+        context: Objeto de contexto de AWS Lambda.
+        
+    Returns:
+        Diccionario con la respuesta HTTP para API Gateway.
+    """
     try:
         # Ejecutar scraping
         main()
@@ -32,7 +47,7 @@ def lambda_handler(event, context) -> dict:
 
 
 if __name__ == "__main__":
-    test_event = {}
+    test_event: Dict[str, Any] = {}
     test_context = None
-    lambda_handler(test_event,test_context)
+    lambda_handler(test_event, test_context)
 

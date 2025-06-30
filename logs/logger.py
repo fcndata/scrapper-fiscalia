@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+
 # Log directory
 LOG_DIR = Path("/tmp/logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -22,3 +23,4 @@ logging.basicConfig(
 
 # Logger instance
 logger = logging.getLogger(__name__)
+

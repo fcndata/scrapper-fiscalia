@@ -10,6 +10,15 @@ Asegúrate de que todo el código siga las convenciones PEP 8:
 - Usa espacios alrededor de operadores
 - Evita líneas en blanco innecesarias
 
+## Type Hints
+- Usa anotaciones de tipo (type hints) en todas las funciones y métodos
+- Importa tipos complejos desde el módulo `typing`
+- Usa `Optional[Tipo]` para parámetros que pueden ser None
+- Usa `Union[Tipo1, Tipo2]` para parámetros que pueden ser de diferentes tipos
+- Usa `List[Tipo]`, `Dict[KeyTipo, ValorTipo]`, etc. para colecciones
+- Especifica siempre el tipo de retorno, usa `-> None` cuando no hay retorno
+- Para métodos de clase, usa `-> Self` cuando retornan self
+
 ## Documentación
 Toda función, clase y método debe tener docstrings en formato Google:
 - Descripción breve en primera línea
@@ -20,6 +29,24 @@ Toda función, clase y método debe tener docstrings en formato Google:
 - Examples: para ejemplos de uso cuando sea necesario
 
 Los docstrings deben explicar el "qué" hace la función, no el "cómo".
+
+Ejemplo de docstring con type hints:
+```python
+def process_data(input_data: List[Dict[str, Any]], max_items: Optional[int] = None) -> Dict[str, float]:
+    """
+    Procesa los datos de entrada y calcula estadísticas.
+    
+    Args:
+        input_data: Lista de diccionarios con los datos a procesar.
+        max_items: Número máximo de items a procesar. Si es None, procesa todos.
+        
+    Returns:
+        Diccionario con las estadísticas calculadas.
+        
+    Raises:
+        ValueError: Si input_data está vacío.
+    """
+```
 
 ## Estructura y Organización
 - Cada módulo debe tener una responsabilidad única y bien definida

@@ -1,9 +1,17 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
+from typing import Dict, Optional, Any
+
+from pydantic import BaseModel, Field
+
 
 class CompanyMetadata(BaseModel):
-    ''' Represents metadata for a company. '''
+    """
+    Representa los metadatos de una empresa o sociedad.
+    
+    Esta clase modela la información extraída de las fuentes oficiales
+    sobre empresas y sociedades, incluyendo su identificación, datos
+    de registro y fechas relevantes.
+    """
     rut: Optional[str]
     razon_social: str
     url: Optional[str]
@@ -16,9 +24,15 @@ class CompanyMetadata(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    def serialize(self) -> dict:
+    def serialize(self) -> Dict[str, Any]:
         """
-        Serializa el objeto a dict para exportación.
+        Serializa el objeto a diccionario para exportación.
+        
+        Convierte las fechas a formato string para facilitar
+        la serialización a JSON.
+        
+        Returns:
+            Dict[str, Any]: Diccionario con los datos serializados.
         """
         return {
             "rut": self.rut,
