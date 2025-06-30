@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Infraestructura para el Scraper Fiscalía
+
+Parameters:
+  ECRRepositoryUri:
+    Type: String
+    Description: URI del repositorio ECR que contiene la imagen del scraper
+    # Ejemplo: 123456789012.dkr.ecr.us-east-1.amazonaws.com/scraper-fiscalia:latest
+  
+  ScheduleExpression:
+    Type: String
+    Description: Expresión cron para la ejecución programada
+    Default: cron(0 1 * * ? *)  # Ejecutar diariamente a la 1:00 AM UTC
+  
+  S3BucketName:
+    Type: String
+    Description: Nombre del bucket S3 para almacenar los datos
+    Default: v1-st-bech-inegocio-analitica-sandbox-zone
+
+Resources:
+  # Rol IAM para la función Lambda
+  ScraperLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ScraperS3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${S3BucketName}
+                  - !Sub arn:aws:s3:::${S3BucketName}/*
+  
+  # Función Lambda que ejecuta el scraper
+  ScraperFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: !Ref ECRRepositoryUri
+      Role: !GetAtt ScraperLambdaRole.Arn
+      Timeout: 300  # 5 minutos
+      MemorySize: 1024
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref S3BucketName
+      Events:
+        ScheduledExecution:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref ScheduleExpression
+            Name: ScraperDailyExecution
+            Description: Ejecución programada del scraper
+            Enabled: true
+  
+  # Grupo de logs para la función Lambda
+  ScraperLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ScraperFunction}
+      RetentionInDays: 30
+
+Outputs:
+  ScraperFunctionArn:
+    Description: ARN de la función Lambda del scraper
+    Value: !GetAtt ScraperFunction.Arn
+  
+  ScraperLogGroupName:
+    Description: Nombre del grupo de logs de CloudWatch
+    Value: !Ref ScraperLogGroup

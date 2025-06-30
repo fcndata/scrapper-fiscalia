@@ -1,0 +1,13 @@
+{
+    "Name": "ScraperFiscaliaDailyExecution",
+    "ScheduleExpression": "cron(0 1 * * ? *)",
+    "State": "ENABLED",
+    "Description": "Ejecuta el Scraper Fiscalía diariamente a la 1:00 AM UTC",
+    "Targets": [
+        {
+            "Id": "ScraperLambdaTarget",
+            "Arn": "arn:aws:lambda:REGION:ACCOUNT_ID:function:scraper-fiscalia-ScraperFunction-XXXX",
+            "Input": "{}"
+        }
+    ]
+}
