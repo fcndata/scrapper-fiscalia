@@ -8,7 +8,7 @@ urls:
   diario_oficial: https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=
   
 output:
-  sociedades: /tmp/empresa_scraper.jsonl
+  sociedades: /tmp/empresa_scraper.jsonl 
   diario_oficial: /tmp/diario_scraper.jsonl
   log_file: /tmp/failed_uploads.csv
   json_output_folder: /tmp/output
@@ -17,3 +17,4 @@ aws:
   s3_bucket: 'v1-st-bech-inegocio-analitica-sandbox-zone'
   s3_name: 'scraper/fiscalia'
   region: 'us-east-1'
+  athena_maestro_empresa: ''

@@ -93,9 +93,14 @@ def extract_metadata(row: Tag) -> Tuple[str, str, str, str]:
 
     # Extraer RUT
     rut_div = cols[0].find('div', style=lambda x: x and 'float:right' in x)
-    rut = rut_div.text.strip() if rut_div else None
-    if not rut:
-        raise ValueError("No se pudo extraer el RUT")
+    
+    raw_rut = rut_div.text.strip().replace('*','') if rut_div else None
+    
+    if raw_rut:
+        number_part, dv_part = raw_rut.split('-')
+        number_part = number_part.replace('.', '')
+    else:
+        number_part, dv_part = None, None
     
     # Extraer URL y CVE
     link = cols[1].find('a')
@@ -112,7 +117,7 @@ def extract_metadata(row: Tag) -> Tuple[str, str, str, str]:
     if not cve:
         raise ValueError("No se pudo extraer el CVE")
 
-    return rut.replace('*','').replace('.',''), razon_social, url_pdf, cve
+    return number_part,dv_part, razon_social, url_pdf, cve
     
 
 def jsonl_to_parquet(jsonl_path: str, parquet_path: str) -> bool:

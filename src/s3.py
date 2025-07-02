@@ -120,7 +120,7 @@ class S3Manager:
         Sube un archivo procesado a S3 con timestamp y path diario.
         
         Args:
-            local_path: Ruta local del archivo a subir.
+            local_path: Ruta local del archivo a subir (debe ser .parquet).
             filename: Nombre base del archivo (sin extensión).
             
         Returns:
@@ -128,12 +128,12 @@ class S3Manager:
         """
         timestamp = datetime.now().strftime("%H%M%S")
         daily_path = self._get_daily_path()
-        s3_key = f"{daily_path}processed/{filename}_{timestamp}.jsonl"
+        s3_key = f"{daily_path}processed/{filename}_{timestamp}.parquet"
         
         try:
             self.s3_client.upload_file(local_path, self.bucket_name, s3_key)
             s3_url = f"s3://{self.bucket_name}/{s3_key}"
-            logger.info(f"Processed file uploaded: {s3_url}")
+            logger.info(f"Processed parquet uploaded: {s3_url}")
             return s3_url
         except ClientError as e:
             logger.error(f"AWS error uploading processed file {local_path}: {e}")

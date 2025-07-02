@@ -403,9 +403,12 @@ class SociedadScraper(BaseScraper):
                 raise ValueError("Cambio en la estructura de la tabla, debe revisarse!")
 
             try:
+                raw_rut = cols[2]
+                number_part, dv_part = raw_rut.split('-')
                 # Construcción del objeto
                 obj = CompanyMetadata(
-                    rut=cols[2].replace('.',''),
+                    rut=number_part.replace('.',''),
+                    rut_df=dv_part,
                     razon_social=cols[4],
                     url=self.driver.current_url,
                     actuacion=cols[1],
@@ -554,10 +557,11 @@ class DiarioScraper(BaseScraper):
                         continue
 
                     try:
-                        rut_number, razon, url_pdf, cve_number = extract_metadata(row)
+                        rut_number,dv_number, razon, url_pdf, cve_number = extract_metadata(row)
                         
                         obj = CompanyMetadata(
-                            rut=rut_number, 
+                            rut=rut_number,
+                            rut_df=dv_number, 
                             razon_social=razon,
                             url=url_pdf,
                             actuacion=current_actuacion,

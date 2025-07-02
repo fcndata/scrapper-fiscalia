@@ -13,6 +13,7 @@ class CompanyMetadata(BaseModel):
     de registro y fechas relevantes.
     """
     rut: Optional[str]
+    rut_df: Optional[str]
     razon_social: str
     url: Optional[str]
     actuacion: str

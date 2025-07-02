@@ -1,5 +1,4 @@
 {
-    "python.defaultInterpreterPath": "C:\\Users\\Facundo Toneguzzo\\miniconda3\\envs\\scraperenv\\python.exe",
     "python.venvPath": "${workspaceFolder}",
     "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
