@@ -37,6 +37,7 @@ class CompanyMetadata(BaseModel):
         """
         return {
             "rut": self.rut,
+            "rut_df": self.rut_df,
             "razon_social": self.razon_social,
             "url": self.url,
             "actuacion": self.actuacion,
