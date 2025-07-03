@@ -46,13 +46,13 @@ class S3Manager:
     
     def upload_raw(self) -> List[str]:
         """
-        Procesa todos los archivos JSONL en /tmp, los convierte a Parquet y los sube a S3.
+        Sube todos los archivos JSONL en /tmp directamente a S3.
         
-        Busca todos los archivos .jsonl en el directorio /tmp, los convierte
-        a formato Parquet y los sube al bucket de S3 en la carpeta 'raw'.
+        Busca todos los archivos .jsonl en el directorio /tmp y los sube
+        al bucket de S3 en la carpeta 'raw' manteniendo el formato JSONL.
         
         Returns:
-            Lista de URLs de S3 de los archivos subidos.
+            Lista con los nombres de los archivos JSONL procesados.
             
         Raises:
             No lanza excepciones directamente, captura y registra errores internamente.
@@ -65,24 +65,19 @@ class S3Manager:
         
         for jsonl_file in jsonl_files:
             try:
-                # Convertir JSONL a Parquet usando utils
-                parquet_file = f"/tmp/{jsonl_file.stem}.parquet"
-                
-                if not jsonl_to_parquet(str(jsonl_file), parquet_file):
-                    logger.warning(f"No records found in {jsonl_file}")
+                # Verificar que el archivo no esté vacío
+                if jsonl_file.stat().st_size == 0:
+                    logger.warning(f"Empty file: {jsonl_file}")
                     continue
-                
-                # Subir a S3
+                    
+                # Subir a S3 directamente en formato JSONL
                 daily_path = self._get_daily_path()
-                s3_key = f"{daily_path}raw/{jsonl_file.stem}.parquet"
+                s3_key = f"{daily_path}raw/{jsonl_file.name}"
                 
-                self.s3_client.upload_file(parquet_file, self.bucket_name, s3_key)
+                self.s3_client.upload_file(str(jsonl_file), self.bucket_name, s3_key)
                 s3_url = f"s3://{self.bucket_name}/{s3_key}"
                 uploaded_files.append(s3_url)
-                logger.info(f"Raw parquet uploaded: {s3_url}")
-                
-                # Limpiar archivo temporal
-                Path(parquet_file).unlink()
+                logger.info(f"Raw JSONL uploaded: {s3_url}")
                 
             except ClientError as e:
                 logger.error(f"AWS error processing {jsonl_file}: {e}")
