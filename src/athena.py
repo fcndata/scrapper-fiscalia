@@ -6,6 +6,7 @@ import pandas as pd
 
 from config import config
 from logs.logger import logger
+from utils import query_empresas, query_funcionarios
 
 class AthenaManager:
     """
@@ -107,23 +108,9 @@ class AthenaManager:
         """
         if ruts:
             ruts_str = "', '".join(ruts)
-            query = f'''SELECT rut_cliente,
-                    rut_cliente_dv,
-                    segmento,
-                    plataforma,
-                    ejec_cod,
-                    fecha_proceso
-                    FROM "bd_in_tablas_generales"."tbl_maestro_empresas" WHERE rut_cliente IN (\'{ruts_str}\')'''
-        else:
-            query = '''SELECT rut_cliente,
-                    rut_cliente_dv,
-                    segmento,
-                    plataforma,
-                    ejec_cod,
-                    fecha_proceso
-                    FROM "bd_in_tablas_generales"."tbl_maestro_empresas"'''
-        
-        return self.execute_query(query, "bd_in_tablas_generales")
+
+            
+        return self.execute_query(query_empresas(ruts), "bd_in_tablas_generales")
     
     def get_funcionarios_data(self, ruts: Optional[List[str]] = None) -> pd.DataFrame:
         """
@@ -135,26 +122,5 @@ class AthenaManager:
         Returns:
             DataFrame con los datos de funcionarios.
         """
-        if ruts:
-            ruts_str = "', '".join(ruts)
-            query = f'''SELECT 
-            rut_funcionario,
-            rut_funcionario_dv,
-            nombre_funcionario,
-            nombre_puesto,
-            correo,
-            dependencia,
-            fecha_carga_dl
-            FROM "bd_dlk_bcc_tablas_generales"."tbl_base_funcionarios" WHERE rut_funcionario IN (\'{ruts_str}\') LIMIT 100'''
-        else:
-            query = '''SELECT 
-            rut_funcionario,
-            rut_funcionario_dv,
-            nombre_funcionario,
-            nombre_puesto,
-            correo,
-            dependencia,
-            fecha_carga_dl
-            FROM "bd_dlk_bcc_tablas_generales"."tbl_base_funcionarios" LIMIT 100'''
-        
-        return self.execute_query(query, "bd_dlk_bcc_tablas_generales")
+
+        return self.execute_query(query_funcionarios(ruts), "bd_dlk_bcc_tablas_generales")

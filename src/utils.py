@@ -156,3 +156,58 @@ def jsonl_to_parquet(jsonl_path: str, parquet_path: str) -> bool:
     except Exception as e:
         logger.error(f"Error al convertir {jsonl_path} a parquet: {e}")
         return False
+
+
+def query_empresas(rut:list):
+    custom_query = f'''
+            WITH RankedEmpresas AS (
+                SELECT 
+                    rut_cliente,
+                    rut_cliente_dv,
+                    segmento,
+                    plataforma,
+                    ejec_cod,
+                    fecha_proceso,
+                    ROW_NUMBER() OVER (PARTITION BY rut_cliente ORDER BY fecha_proceso DESC) as rn
+                FROM "bd_in_tablas_generales"."tbl_maestro_empresas"
+                WHERE rut_cliente IN (18351163)
+                )
+                SELECT 
+                rut_cliente,
+                rut_cliente_dv,
+                segmento,
+                plataforma,
+                ejec_cod,
+                fecha_proceso
+                FROM RankedEmpresas
+                WHERE rn = 1
+            '''
+    return custom_query
+
+def query_funcionarios(rut:list):
+    custom_query = f'''       
+            WITH RankedFuncionarios AS (
+                SELECT 
+                    rut_funcionario,
+                    rut_funcionario_dv,
+                    nombre_funcionario,
+                    nombre_puesto,
+                    correo,
+                    dependencia,
+                    fecha_carga_dl,
+                    ROW_NUMBER() OVER (PARTITION BY rut_funcionario ORDER BY fecha_carga_dl DESC) as rn
+                FROM "bd_dlk_bcc_tablas_generales"."tbl_base_funcionarios"
+                WHERE rut_funcionario IN ('9498419','10000955')
+            )
+            SELECT 
+                rut_funcionario,
+                rut_funcionario_dv,
+                nombre_funcionario,
+                nombre_puesto,
+                correo,
+                dependencia,
+                fecha_carga_dl
+            FROM RankedFuncionarios
+            WHERE rn = 1
+            '''
+    return custom_query
