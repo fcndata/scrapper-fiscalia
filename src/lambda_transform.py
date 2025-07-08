@@ -38,87 +38,80 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         athena_manager = AthenaManager()
         transformed_files = []
         
-        # Procesar cada archivo
-        for file_path in uploaded_files:
-            try:
-                logger.info(f"Procesando archivo: {file_path}")
-                
-                # 1. Descargar archivo raw usando S3Manager
-                s3_key = file_path.replace(f"s3://{s3_manager.bucket_name}/", "")
-                local_raw_path = f"/tmp/raw_data.parquet"
-                
-                if not s3_manager.download_raw(s3_key, local_raw_path):
-                    logger.error(f"Error al descargar archivo: {file_path}")
-                    continue
-                
-                # Cargar datos raw
-                raw_df = pd.read_parquet(local_raw_path)
-                logger.info(f"Datos raw cargados: {len(raw_df)} registros")
-                
-                # Obtener lista de RUTs únicos
-                ruts = raw_df['rut'].unique().tolist()
-                
-                # 2. Consultar tablas en Athena con filtros
-                try:
-                    empresas_df = athena_manager.get_empresas_data(ruts)
-                    funcionarios_df = athena_manager.get_funcionarios_data(ruts)
-                except Exception as e:
-                    # Crear DataFrames vacíos para pruebas
-                    empresas_df = pd.DataFrame(columns=['rut_cliente', 'rut_cliente_dv', 'segmento', 'plataforma'])
-                    funcionarios_df = pd.DataFrame(columns=['rut_funcionario', 'nombre_funcionario', 'cargo'])    
-               
-                logger.info(f"Empresas encontradas: {len(empresas_df)}")
-                logger.info(f"Funcionarios encontrados: {len(funcionarios_df)}")
+        list_objects = s3_manager.download_raw()
+        empresas = athena_manager.get_empresas_data(list_objects)
+        funcionarios = athena_manager.get_funcionarios_data(empresas)
+
+        def merge_data(list_objects, empresas, funcionarios):
+            # Convertir list_objects a DataFrame
+            raw_df = pd.DataFrame(list_objects)
             
-                # 3. Lógica de transformación - Crear nuevo DataFrame
-                transformed_df = raw_df.copy()
-                
-                # Unir con datos de empresas
-                if not empresas_df.empty and 'rut_cliente' in empresas_df.columns:
-                    empresas_df_renamed = empresas_df.rename(columns={'rut_cliente': 'rut'})
-                    transformed_df = pd.merge(
-                        transformed_df,
-                        empresas_df_renamed,
-                        on='rut',
-                        how='left',
-                        suffixes=('', '_empresa')
-                    )
-                
-                # Unir con datos de funcionarios
-                if not funcionarios_df.empty and 'rut_funcionario' in funcionarios_df.columns:
-                    funcionarios_df_renamed = funcionarios_df.rename(columns={'rut_funcionario': 'rut'})
-                    transformed_df = pd.merge(
-                        transformed_df,
-                        funcionarios_df_renamed,
-                        on='rut',
-                        how='left',
-                        suffixes=('', '_funcionario')
-                    )
-                
-                logger.info(f"Datos transformados: {len(transformed_df)} registros con {len(transformed_df.columns)} columnas")
-                
-                # 4. Guardar archivo transformado usando S3Manager
-                filename = file_path.split('/')[-1].split('.')[0]
-                local_processed_path = f"/tmp/{filename}_transformed.parquet"
-                
-                transformed_df.to_parquet(local_processed_path, index=False)
-                
-                # Subir usando upload_processed
-                s3_url = s3_manager.upload_processed(local_processed_path, f"{filename}_transformed")
-                
-                if s3_url:
-                    transformed_files.append(s3_url)
-                    logger.info(f"Archivo transformado subido: {s3_url}")
-                
-            except Exception as e:
-                logger.error(f"Error al procesar archivo {file_path}: {e}")
+            # Añadir un identificador único para rastrear filas originales
+            raw_df['original_index'] = range(len(raw_df))
+            
+            # Asegurar que los tipos de datos sean compatibles para los joins
+            if 'rut' in raw_df.columns:
+                # Convertir rut a string para hacer el join
+                raw_df['rut'] = raw_df['rut'].astype(str)
+            
+            # Convertir rut_cliente a string en empresas
+            if 'rut_cliente' in empresas.columns:
+                empresas['rut_cliente'] = empresas['rut_cliente'].astype(str)
+            
+            # Asegurar que los códigos de ejecutivo son del mismo tipo
+            if 'ejec_cod' in empresas.columns:
+                empresas['ejec_cod'] = empresas['ejec_cod'].astype(str)
+            
+            if 'ejc_cod' in funcionarios.columns:
+                funcionarios['ejc_cod'] = funcionarios['ejc_cod'].astype(str)
+            
+            # Unir empresas con funcionarios
+            aggregated_df = pd.merge(
+                empresas,
+                funcionarios,
+                left_on='ejec_cod',
+                right_on='ejc_cod',
+                how='left')
+            
+            # Unir el resultado con raw_df
+            final_df = pd.merge(
+                aggregated_df,
+                raw_df,
+                left_on='rut_cliente',
+                right_on='rut',
+                how='right')
+            
+            # Verificar si hay duplicados en original_index
+            duplicated_indices = final_df['original_index'].duplicated()
+            if duplicated_indices.any():
+                logger.warning(f"Se encontraron {duplicated_indices.sum()} filas duplicadas")
+                # Eliminar duplicados manteniendo la primera ocurrencia
+                final_df = final_df.drop_duplicates(subset=['original_index'])
+            
+            # Seleccionar columnas relevantes
+            columns_to_keep = ['rut', 'rut_df', 'razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
+                              'segmento', 'plataforma', 'ejec_cod', 'rut_funcionario', 'rut_funcionario_dv',
+                              'nombre_funcionario', 'nombre_puesto', 'correo', 'dependencia',
+                              'fecha', 'fecha_actuacion']
+            
+            # Filtrar solo las columnas que existen en el DataFrame
+            final_columns = [col for col in columns_to_keep if col in final_df.columns]
+            final_df = final_df[final_columns]
+
+            return final_df
+        final_df = merge_data(list_objects, empresas, funcionarios)
+        len_final_df = len(final_df)
+        len_objects = len(list_objects)
         
-        # Preparar respuesta
+        # Verificar si los conteos coinciden
+        if len_final_df != len_objects:
+            logger.warning(f"Discrepancia en conteos: {len_objects} registros originales vs {len_final_df} en el resultado final")
+        
         response = {
             "statusCode": 200,
-            "raw_df": raw_df.head(5).to_dict(orient='records'),
-            "empresas_df": empresas_df.head(5).to_dict(orient='records'), 
-            "funcionarios_df": funcionarios_df.head(5).to_dict(orient='records'),
+            "len_validation": f'extracted:{len_objects} transformed:{len_final_df}',
+            "counts_match": len_final_df == len_objects,
+            "final_df": final_df.head(100).to_dict(orient='records'),
             "body": json.dumps({
                 "transformed_files": transformed_files,
                 "message": f"Se transformaron {len(transformed_files)} de {len(uploaded_files)} archivos"

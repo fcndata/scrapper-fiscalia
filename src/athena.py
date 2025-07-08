@@ -1,12 +1,12 @@
 import time
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 import boto3
 import pandas as pd
 
 from config import config
 from logs.logger import logger
-from utils import query_empresas, query_funcionarios
+from src.utils import query_empresas, query_funcionarios
 
 class AthenaManager:
     """
@@ -27,7 +27,7 @@ class AthenaManager:
     def execute_query(self, query: str, database: str) -> pd.DataFrame:
         """
         Ejecuta una consulta en Athena y devuelve los resultados como DataFrame.
-        
+
         Args:
             query: Consulta SQL a ejecutar.
             database: Base de datos de Athena donde ejecutar la consulta.
@@ -35,21 +35,30 @@ class AthenaManager:
         Returns:
             DataFrame con los resultados de la consulta.
         """
-        logger.info(f"Ejecutando consulta en {database}")
+        logger.info(f"Ejecutando consulta en {database}: {query}")
         
-        response = self.athena_client.start_query_execution(
-            QueryString=query,
-            QueryExecutionContext={'Database': database},
-            ResultConfiguration={'OutputLocation': self.output_location}
-        )
-        
-        query_id = response['QueryExecutionId']
-        status = self._wait_for_completion(query_id)
-        
-        if status != 'SUCCEEDED':
-            raise Exception(f"La consulta falló con estado: {status}")
-        
-        return self._get_results(query_id)
+        try:
+            response = self.athena_client.start_query_execution(
+                QueryString=query,
+                QueryExecutionContext={'Database': database},
+                ResultConfiguration={'OutputLocation': self.output_location}
+            )
+            
+            query_id = response['QueryExecutionId']
+            status = self._wait_for_completion(query_id)
+            
+            if status != 'SUCCEEDED':
+                # Obtener detalles del error
+                error_details = self.athena_client.get_query_execution(QueryExecutionId=query_id)
+                error_message = error_details.get('QueryExecution', {}).get('Status', {}).get('StateChangeReason', 'No details available')
+                logger.error(f"Error en consulta Athena: {error_message}")
+                raise Exception(f"La consulta falló con estado: {status}. Detalles: {error_message}")
+            
+            return self._get_results(query_id)
+        except Exception as e:
+            logger.error(f"Error al ejecutar consulta en Athena: {str(e)}")
+            # Crear un DataFrame vacío para evitar errores en el flujo
+            return pd.DataFrame()
     
     def _wait_for_completion(self, query_id: str) -> str:
         """
@@ -96,31 +105,45 @@ class AthenaManager:
         
         return df
     
-    def get_empresas_data(self, ruts: Optional[List[str]] = None) -> pd.DataFrame:
+    def get_empresas_data(self, list_objects: Optional[List[Dict[str, Any]]] = None) -> pd.DataFrame:
         """
         Obtiene los datos de la tabla maestro de empresas.
         
         Args:
-            ruts: Lista de RUTs para filtrar. Si es None, obtiene todos los registros.
+            list_objects: Lista de objetos con datos que incluyen RUTs para filtrar.
+                         Si es None, devuelve un DataFrame vacío.
         
         Returns:
             DataFrame con los datos de empresas.
         """
-        if ruts:
-            ruts_str = "', '".join(ruts)
-
+        if not list_objects:
+            logger.warning("No se proporcionaron objetos para consultar datos de empresas")
+            return pd.DataFrame()
             
-        return self.execute_query(query_empresas(ruts), "bd_in_tablas_generales")
+        return self.execute_query(query_empresas(list_objects), "bd_in_tablas_generales")
     
-    def get_funcionarios_data(self, ruts: Optional[List[str]] = None) -> pd.DataFrame:
+    def get_funcionarios_data(self, empresas_df: pd.DataFrame) -> pd.DataFrame:
         """
-        Obtiene los datos de la tabla base de funcionarios.
+        Obtiene los datos de la tabla base de funcionarios basado en los códigos de ejecutivo
+        de las empresas.
         
         Args:
-            ruts: Lista de RUTs para filtrar. Si es None, obtiene todos los registros.
+            empresas_df: DataFrame con datos de empresas que incluye la columna 'ejec_cod'.
         
         Returns:
             DataFrame con los datos de funcionarios.
         """
-
-        return self.execute_query(query_funcionarios(ruts), "bd_dlk_bcc_tablas_generales")
+        if empresas_df.empty:
+            logger.warning("DataFrame de empresas vacío, no se pueden obtener funcionarios")
+            return pd.DataFrame()
+            
+        if 'ejec_cod' not in empresas_df.columns:
+            logger.warning("No se encontró la columna 'ejec_cod' en el DataFrame de empresas")
+            return pd.DataFrame()
+            
+        ejec_codes = empresas_df['ejec_cod'].dropna().unique().tolist()
+        logger.info(f"Códigos de ejecutivo únicos encontrados: {len(ejec_codes)}")
+        if ejec_codes:
+            logger.info(f"Primeros códigos de ejecutivo: {ejec_codes[:5]}")
+            
+        return self.execute_query(query_funcionarios(ejec_codes), "bd_dlk_bcc_tablas_generales")

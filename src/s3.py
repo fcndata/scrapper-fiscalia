@@ -9,8 +9,7 @@ from botocore.exceptions import ClientError
 
 from config import config
 from logs.logger import logger
-from src.models import CompanyMetadata
-from src.utils import jsonl_to_parquet
+
 
 
 class S3Manager:
