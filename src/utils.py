@@ -279,3 +279,51 @@ def query_funcionarios(ejec_code: List) -> str:
             WHERE rn = 1
             '''
     return custom_query
+
+
+def merge_data(list_objects, empresas, funcionarios):
+
+        raw_df = pd.DataFrame(list_objects)
+        raw_df['original_index'] = range(len(raw_df))
+
+        if 'rut' in raw_df.columns:
+            raw_df['rut'] = raw_df['rut'].astype(str)
+        
+        if 'rut_cliente' in empresas.columns:
+            empresas['rut_cliente'] = empresas['rut_cliente'].astype(str)
+        
+        if 'ejec_cod' in empresas.columns:
+            empresas['ejec_cod'] = empresas['ejec_cod'].astype(str)
+        
+        if 'ejc_cod' in funcionarios.columns:
+            funcionarios['ejc_cod'] = funcionarios['ejc_cod'].astype(str)
+
+        metadata = pd.merge(
+            empresas,
+            funcionarios,
+            left_on='ejec_cod',
+            right_on='ejc_cod',
+            how='left')
+
+        final_df = pd.merge(
+            metadata,
+            raw_df,
+            left_on='rut_cliente',
+            right_on='rut',
+            how='right')
+        
+        # Verificar si hay duplicados en original_index
+        duplicated_indices = final_df['original_index'].duplicated()
+        if duplicated_indices.any():
+            logger.warning(f"Se encontraron {duplicated_indices.sum()} filas duplicadas")
+            final_df = final_df.drop_duplicates(subset=['original_index'])
+
+        columns_to_keep = ['rut', 'rut_df', 'razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
+                            'segmento', 'plataforma', 'ejec_cod', 'rut_funcionario', 'rut_funcionario_dv',
+                            'nombre_funcionario', 'nombre_puesto', 'correo', 'dependencia',
+                            'fecha', 'fecha_actuacion']
+
+        final_columns = [col for col in columns_to_keep if col in final_df.columns]
+        final_df = final_df[final_columns]
+
+        return final_df

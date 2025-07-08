@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Union, Dict, Any
 
 import boto3
+import pandas as pd
 from botocore.exceptions import ClientError
 
 from config import config
@@ -151,38 +152,45 @@ class S3Manager:
             
             logger.info(f"Consolidated {len(all_records)} records from {len(jsonl_files)} files")
             return all_records
-            
-        except ClientError as e:
-            logger.error(f"AWS error during consolidation from raw path: {e}")
-            return []
+
         except Exception as e:
             logger.error(f"Error during consolidation from raw path: {e}")
             return []
     
-    def upload_processed(self, local_path: str, filename: str) -> Optional[str]:
+    def upload_processed(self, df: pd.DataFrame, filename: str) -> Optional[str]:
         """
-        Sube un archivo procesado a S3 con timestamp y path diario.
+        Sube un DataFrame directamente a S3 en formato Parquet.
         
         Args:
-            local_path: Ruta local del archivo a subir (debe ser .parquet).
+            df: DataFrame de pandas a subir.
             filename: Nombre base del archivo (sin extensión).
             
         Returns:
             URL de S3 del archivo subido o None si hubo un error.
         """
-        timestamp = datetime.now().strftime("%H%M%S")
-        s3_key = f"{self.processed_path}{filename}_{timestamp}.parquet"
-        
-        try:
-            self.s3_client.upload_file(local_path, self.bucket_name, s3_key)
-            s3_url = f"s3://{self.bucket_name}/{s3_key}"
-            logger.info(f"Processed parquet uploaded: {s3_url}")
-            return s3_url
-        except ClientError as e:
-            logger.error(f"AWS error uploading processed file {local_path}: {e}")
+        if df.empty:
+            logger.warning("DataFrame vacío, no se subirá a S3")
             return None
+            
+        try:
+            # Crear un nombre de archivo con timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            s3_key = f"{self.processed_path}{filename}_{timestamp}.parquet"
+            
+            # Convertir DataFrame a bytes en formato Parquet
+            parquet_buffer = BytesIO()
+            df.to_parquet(parquet_buffer, index=False)
+            parquet_buffer.seek(0)  # Volver al inicio del buffer
+            
+            # Subir el buffer directamente a S3
+            self.s3_client.upload_fileobj(parquet_buffer, self.bucket_name, s3_key)
+            
+            s3_url = f"s3://{self.bucket_name}/{s3_key}"
+            logger.info(f"DataFrame uploaded as Parquet: {s3_url} with {len(df)} records")
+            return s3_url
+            
         except Exception as e:
-            logger.error(f"Error uploading processed file {local_path}: {e}")
+            logger.error(f"Error uploading DataFrame to S3: {e}")
             return None
     
     def download_processed(self, local_path: str) -> bool:
