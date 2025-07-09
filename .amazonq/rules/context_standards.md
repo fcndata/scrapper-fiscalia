@@ -1,72 +1,30 @@
-# Estándares para Pin Context en Amazon Q
-
-## Estructura del Contexto Fijado
-Cuando fijes contexto en Amazon Q, sigue esta estructura para mantener la información organizada:
-
-```
-# [NOMBRE DEL PROYECTO/MÓDULO]
-
-## Propósito
-Breve descripción del propósito del proyecto o módulo.
-
-## Arquitectura
-Descripción concisa de la arquitectura del sistema.
-
-## Flujo de Datos
-Explicación de cómo fluyen los datos a través del sistema.
-
-## Dependencias Clave
-Lista de dependencias externas críticas.
-
-## Estado Actual
-Descripción del estado actual del desarrollo.
-
-## Problemas Conocidos
-Lista de problemas conocidos o limitaciones.
-```
-
-## Reglas para Fijar Contexto
-
-1. **Sé conciso**: Limita cada sección a 3-5 puntos clave.
-
-2. **Usa formato Markdown**: Utiliza encabezados, listas y código para mejorar la legibilidad.
-
-3. **Incluye solo información esencial**: Fija solo la información que necesitas que Amazon Q recuerde constantemente.
-
-4. **Actualiza regularmente**: Actualiza el contexto fijado cuando haya cambios significativos en el proyecto.
-
-5. **Estructura jerárquica**: Organiza la información de lo general a lo específico.
-
-## Ejemplos de Contexto Bien Estructurado
-
-### Ejemplo para un Scraper:
-
-```
 # SCRAPER FISCALÍA
 
 ## Propósito
-Extraer y procesar datos de documentos públicos de la Fiscalía.
+Sistema completo de extracción, transformación y enriquecimiento de datos empresariales desde fuentes oficiales chilenas. Extrae datos del Registro de Empresas y Sociedades y del Diario Oficial, los enriquece con información corporativa y genera datasets consolidados en formato Parquet para análisis empresarial.
 
 ## Arquitectura
-- Módulo scraper.py: Extracción de datos
-- Módulo utils.py: Funciones auxiliares
-- Módulo s3.py: Almacenamiento de datos
+- **Extracción**: Scrapers (Selenium + BeautifulSoup) → JSONL → S3 raw/
+- **Transformación**: S3 raw/ → Athena queries → DataFrame merge → S3 processed/ (Parquet)
+- **Enriquecimiento**: Datos oficiales + datos empresariales + datos funcionarios
+- **Almacenamiento**: AWS S3 con estructura jerárquica por fecha (YYYYMMDD/raw|processed/)
+- **Consultas**: AWS Athena para bases de datos corporativas
 
 ## Flujo de Datos
-1. Extracción de URLs desde la página principal
-2. Descarga de documentos PDF
-3. Extracción de metadatos
-4. Almacenamiento en formato JSONL/Parquet
+1. **Lambda Extracción**: Scraping → Validación → JSONL → S3 raw/
+2. **Lambda Transformación**: S3 raw/ → Consolidación → Athena queries → Merge → S3 processed/ (Parquet)
+3. **Estructura final**: Datos oficiales + segmento + plataforma + ejecutivo + funcionario
 
 ## Dependencias Clave
-- BeautifulSoup para parsing HTML
-- Pandas para procesamiento de datos
-- AWS S3 para almacenamiento
+- **Scraping**: Selenium, BeautifulSoup, Chrome/Chromedriver
+- **Datos**: Pandas, Pydantic, PyAthena
+- **AWS**: Boto3 (S3, Athena)
+- **Formato**: Parquet para consultas eficientes
 
 ## Estado Actual
-Implementación básica completa, optimizando rendimiento.
+Sistema completo funcionando con dos Lambdas independientes. Procesa ~1100 registros por ejecución con >95% de éxito en enriquecimiento. Optimizado para consultas SQL con ROW_NUMBER() para evitar duplicados. Manejo robusto de errores y logging detallado.
 
 ## Problemas Conocidos
-- Manejo de errores en conexiones intermitentes
-- Validación de datos incompleta
-```
+- Dependencia de disponibilidad de fuentes oficiales
+- Rate limiting en consultas Athena
+- Cambios potenciales en estructura de páginas web
