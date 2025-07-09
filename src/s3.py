@@ -174,15 +174,13 @@ class S3Manager:
             
         try:
             # Crear un nombre de archivo con timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"{self.processed_path}{filename}_{timestamp}.parquet"
+            s3_key = f"{self.processed_path}{filename}.parquet"
             
             # Convertir DataFrame a bytes en formato Parquet
             parquet_buffer = BytesIO()
             df.to_parquet(parquet_buffer, index=False)
-            parquet_buffer.seek(0)  # Volver al inicio del buffer
+            parquet_buffer.seek(0)
             
-            # Subir el buffer directamente a S3
             self.s3_client.upload_fileobj(parquet_buffer, self.bucket_name, s3_key)
             
             s3_url = f"s3://{self.bucket_name}/{s3_key}"
