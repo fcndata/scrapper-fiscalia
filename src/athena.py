@@ -20,6 +20,7 @@ class AthenaManager:
         self.region = config.get("aws.region", "us-east-1")
         self.bucket_name = config.get("aws.s3_bucket")
         self.output_location = f"s3://{self.bucket_name}/athena-results/"
+        self.workgroup = config.get("aws.athena_workgroup", "scraper-fiscalia")
         
         self.athena_client = boto3.client('athena', region_name=self.region)
         self.s3_client = boto3.client('s3', region_name=self.region)
@@ -41,7 +42,8 @@ class AthenaManager:
             response = self.athena_client.start_query_execution(
                 QueryString=query,
                 QueryExecutionContext={'Database': database},
-                ResultConfiguration={'OutputLocation': self.output_location}
+                ResultConfiguration={'OutputLocation': self.output_location},
+                WorkGroup=self.workgroup
             )
             
             query_id = response['QueryExecutionId']
