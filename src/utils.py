@@ -225,11 +225,14 @@ def query_funcionarios(ejec_code: List) -> str:
         devuelve una consulta que no retornará resultados.
     """
     # Formatear y validar códigos de ejecutivo
-    ejec_list = f"({', '.join([f"'{str(code)}'" for code in ejec_code if code is not None])})"
+    valid_codes = [str(code) for code in ejec_code if code is not None]
+    ejec_list = f"({', '.join([f"'{code}'" for code in valid_codes])})"
     
-    if ejec_list == "()":
+    if not valid_codes:
         logger.warning("Todos los códigos de ejecutivo eran nulos") 
-        return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"    logger.info(f"Buscando funcionarios para {len(ejec_code_str)} códigos de ejecutivo válidos")
+        return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"
+    
+    logger.info(f"Buscando funcionarios para {len(valid_codes)} códigos de ejecutivo válidos")
     
     custom_query = f'''       
             WITH EjecutivosRUT AS (
