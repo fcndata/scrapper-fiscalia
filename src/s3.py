@@ -10,6 +10,7 @@ from botocore.exceptions import ClientError
 
 from config import config
 from logs.logger import logger
+from src.glue import GlueManager
 
 
 
@@ -155,7 +156,7 @@ class S3Manager:
             logger.error(f"Error during consolidation from raw path: {e}")
             return []
     
-    def upload_processed(self, df: pd.DataFrame, filename: str) -> Optional[str]:
+    def upload_processed(self, df: pd.DataFrame) -> Optional[str]:
         """
         Sube un DataFrame directamente a S3 en formato Parquet.
         
@@ -171,26 +172,15 @@ class S3Manager:
             return None
             
         try:
-            # Crear un nombre de archivo con timestamp
-            
-            s3_key = f"{self.processed_path}{filename}.parquet"
-            
-            # Convertir DataFrame a bytes en formato Parquet
-            parquet_buffer = BytesIO()
-            df.to_parquet(parquet_buffer, index=False)
-            parquet_buffer.seek(0)  # Volver al inicio del buffer
-            
-            # Subir el buffer directamente a S3
-            self.s3_client.upload_fileobj(parquet_buffer, self.bucket_name, s3_key)
-            
-            s3_url = f"s3://{self.bucket_name}/{s3_key}"
-            logger.info(f"DataFrame uploaded as Parquet: {s3_url} with {len(df)} records")
-            return s3_url
-            
-        except Exception as e:
-            logger.error(f"Error uploading DataFrame to S3: {e}")
-            return None
+            glue_manager = GlueManager()
+            s3_url = glue_manager.write_partitioned_data(df)
+            if s3_url:
+                return s3_url
     
+        except Exception as e:
+            logger.warning(f"Error uploading DataFrame to S3: {e}")
+            return None
+
     def download_processed(self, local_path: str) -> bool:
         """
         Descarga y consolida todos los archivos JSONL de la ruta processed en S3 en un único archivo local.

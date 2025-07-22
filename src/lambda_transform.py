@@ -46,7 +46,7 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         
         if len(final_df) == len(list_objects):
 
-            s3_url = s3_manager.upload_processed(final_df, "processed")
+            s3_url = s3_manager.upload_processed(final_df)
             logger.info(f"DataFrame transformado y subido a S3: {s3_url}")
             if s3_url:
                 transformed_files.append(s3_url)
