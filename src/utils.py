@@ -224,19 +224,12 @@ def query_funcionarios(ejec_code: List) -> str:
         Consulta SQL para obtener datos de funcionarios. Si no hay códigos de ejecutivo válidos,
         devuelve una consulta que no retornará resultados.
     """
-    # Asegurar que todos los códigos son strings
-    ejec_code_str = [str(code) for code in ejec_code if code is not None]
+    # Formatear y validar códigos de ejecutivo
+    ejec_list = f"({', '.join([f"'{str(code)}'" for code in ejec_code if code is not None])})"
     
-    # Si todos los códigos eran None, devolver una consulta vacía
-    if not ejec_code_str:
-        logger.warning("Todos los códigos de ejecutivo eran nulos")
-        return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"
-    
-    # Formatear la lista de códigos de ejecutivo para la consulta SQL - con comillas para tipo varchar
-    ejec_list = f"({', '.join([f"'{code}'" for code in ejec_code_str])})"
-    
-    # Añadir logging detallado para depuración
-    logger.info(f"Buscando funcionarios para {len(ejec_code_str)} códigos de ejecutivo válidos")
+    if ejec_list == "()":
+        logger.warning("Todos los códigos de ejecutivo eran nulos") 
+        return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"    logger.info(f"Buscando funcionarios para {len(ejec_code_str)} códigos de ejecutivo válidos")
     
     custom_query = f'''       
             WITH EjecutivosRUT AS (
