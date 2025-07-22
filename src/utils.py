@@ -224,11 +224,6 @@ def query_funcionarios(ejec_code: List) -> str:
         Consulta SQL para obtener datos de funcionarios. Si no hay códigos de ejecutivo válidos,
         devuelve una consulta que no retornará resultados.
     """
-    # Si no hay códigos de ejecutivo, devolver una consulta vacía
-    if not ejec_code:
-        logger.warning("No se encontraron códigos de ejecutivo para consultar")
-        return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"
-    
     # Asegurar que todos los códigos son strings
     ejec_code_str = [str(code) for code in ejec_code if code is not None]
     
@@ -312,13 +307,12 @@ def merge_data(list_objects, empresas, funcionarios):
             right_on='rut',
             how='right')
         
-        # Verificar si hay duplicados en original_index
         duplicated_indices = final_df['original_index'].duplicated()
         if duplicated_indices.any():
             logger.warning(f"Se encontraron {duplicated_indices.sum()} filas duplicadas")
             final_df = final_df.drop_duplicates(subset=['original_index'])
 
-        columns_to_keep = ['rut', 'rut_df', 'razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
+        columns_to_keep = ['fuente','rut', 'rut_df', 'razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
                             'segmento', 'plataforma', 'ejec_cod', 'rut_funcionario', 'rut_funcionario_dv',
                             'nombre_funcionario', 'nombre_puesto', 'correo', 'dependencia',
                             'fecha', 'fecha_actuacion']

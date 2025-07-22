@@ -43,14 +43,12 @@ class S3Manager:
         Genera los paths con la fecha del día para raw y processed.
         
         Establece self.raw_path y self.processed_path con la estructura:
-        scraper/fiscalia/YYYYMMDD/raw/ y scraper/fiscalia/YYYYMMDD/processed/
         """
         today = datetime.now()
-        # Eliminar slash inicial y final para evitar doble slash
         clean_path = self.s3_base_path.strip('/')
-        self.raw_path = f"{clean_path}/{today.strftime('%Y%m%d')}/raw/"
-        self.processed_path = f"{clean_path}/{today.strftime('%Y%m%d')}/processed/"
-    
+        self.raw_path = f"{clean_path}/raw//pa_date={today.strftime('%Y-%m-%d')}/"
+        self.processed_path = f"{clean_path}/processed/pa_date={today.strftime('%Y-%m-%d')}/"
+
     def upload_raw(self) -> List[str]:
         """
         Sube todos los archivos JSONL en /tmp directamente a S3.
@@ -174,8 +172,8 @@ class S3Manager:
             
         try:
             # Crear un nombre de archivo con timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"{self.processed_path}{filename}_{timestamp}.parquet"
+            
+            s3_key = f"{self.processed_path}{filename}.parquet"
             
             # Convertir DataFrame a bytes en formato Parquet
             parquet_buffer = BytesIO()

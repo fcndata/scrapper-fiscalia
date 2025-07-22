@@ -407,6 +407,7 @@ class SociedadScraper(BaseScraper):
                 number_part, dv_part = raw_rut.split('-')
                 # Construcción del objeto
                 obj = CompanyMetadata(
+                    fuente = 'empresa',
                     rut=number_part.replace('.',''),
                     rut_df=dv_part,
                     razon_social=cols[4],
@@ -560,6 +561,7 @@ class DiarioScraper(BaseScraper):
                         rut_number,dv_number, razon, url_pdf, cve_number = extract_metadata(row)
                         
                         obj = CompanyMetadata(
+                            fuente = 'diario_oficial',
                             rut=rut_number,
                             rut_df=dv_number, 
                             razon_social=razon,

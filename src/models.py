@@ -12,6 +12,7 @@ class CompanyMetadata(BaseModel):
     sobre empresas y sociedades, incluyendo su identificación, datos
     de registro y fechas relevantes.
     """
+    fuente: str
     rut: Optional[str]
     rut_df: Optional[str]
     razon_social: str
@@ -19,7 +20,7 @@ class CompanyMetadata(BaseModel):
     actuacion: str
     nro_atencion: Optional[str]
     cve: str
-    fecha: datetime = Field(default_factory=datetime.now)
+    pa_date: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
     fecha_actuacion: datetime
 
     class Config:
@@ -36,6 +37,7 @@ class CompanyMetadata(BaseModel):
             Dict[str, Any]: Diccionario con los datos serializados.
         """
         return {
+            "fuente": self.fuente,
             "rut": self.rut,
             "rut_df": self.rut_df,
             "razon_social": self.razon_social,
@@ -43,6 +45,6 @@ class CompanyMetadata(BaseModel):
             "actuacion": self.actuacion,
             "nro_atencion": self.nro_atencion,
             "cve": self.cve,
-            "fecha": self.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+            "pa_date": self.pa_date,
             "fecha_actuacion": self.fecha_actuacion.strftime("%Y-%m-%d %H:%M:%S")
         }
