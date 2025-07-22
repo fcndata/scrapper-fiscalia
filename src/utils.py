@@ -226,11 +226,14 @@ def query_funcionarios(ejec_code: List) -> str:
     """
     # Formatear y validar códigos de ejecutivo
     valid_codes = [str(code) for code in ejec_code if code is not None]
-    ejec_list = f"({', '.join([f"'{code}'" for code in valid_codes])})"
     
     if not valid_codes:
         logger.warning("Todos los códigos de ejecutivo eran nulos") 
         return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"
+    
+    # Crear la lista de códigos formateados para SQL
+    formatted_codes = [f"'{code}'" for code in valid_codes]
+    ejec_list = "(" + ", ".join(formatted_codes) + ")"
     
     logger.info(f"Buscando funcionarios para {len(valid_codes)} códigos de ejecutivo válidos")
     
