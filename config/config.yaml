@@ -17,4 +17,21 @@ aws:
   s3_bucket: 'v1-st-bech-inegocio-analitica-sandbox-zone'
   s3_name: 'scraper/fiscalia'
   region: 'us-east-1'
-  athena_maestro_empresa: ''
+  
+
+email:
+  to: ['facu_mt@hotmail.com']
+  from: "ftoneguz@bancoestado.cl"
+  subject: "Reporte: Modificación de sociedades"
+  body: "Reporte Modificación de Sociedades, incluye información de /n del diario oficial  y de registro de empresas y sociedades"
+  file_name: "Modificacion_sociedades"
+
+columns:
+  all: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
+    'segmento', 'plataforma', 'ejec_cod', 'rut_funcionario', 'rut_funcionario_dv',
+    'nombre_funcionario', 'nombre_puesto', 'correo', 'dependencia',
+    'pa_date', 'fecha_actuacion']
+  
+  delivery: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
+            'segmento', 'plataforma', 'ejec_cod','nombre_funcionario', 'nombre_puesto', 
+            'correo', 'dependencia','fecha_actuacion']

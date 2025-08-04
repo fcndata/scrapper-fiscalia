@@ -6,3 +6,5 @@ beautifulsoup4
 lxml
 pyyaml
 fastparquet
+openpyxl
+boto3

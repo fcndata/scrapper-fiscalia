@@ -4,7 +4,8 @@ from typing import Dict, Any, Optional, List
 from logs.logger import logger
 from src.s3 import S3Manager
 from src.athena import AthenaManager
-from src.utils import merge_data
+from src.utils import merge_data,reglas_de_negocio
+from src.simple_email_service import SESManager
 
 
 def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict[str, Any]:
@@ -36,29 +37,41 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         # Inicializar gestores
         s3_manager = S3Manager()
         athena_manager = AthenaManager()
-        transformed_files = []
         
         list_objects = s3_manager.download_raw()
+        
         empresas = athena_manager.get_empresas_data(list_objects)
         funcionarios = athena_manager.get_funcionarios_data(empresas)
 
-        final_df = merge_data(list_objects, empresas, funcionarios)
+        enriched_data = merge_data(list_objects, empresas, funcionarios)
         
-        if len(final_df) == len(list_objects):
+        if len(enriched_data) == len(list_objects):
 
-            s3_url = s3_manager.upload_processed(final_df)
+            upload_df = reglas_de_negocio(enriched_data, state='processed')
+
+            s3_url = s3_manager.upload_processed(upload_df)
+
             logger.info(f"DataFrame transformado y subido a S3: {s3_url}")
-            if s3_url:
-                transformed_files.append(s3_url)
+            
+            ses_manager = SESManager()
+
+            delivery_df = reglas_de_negocio(enriched_data, state='delivery')
+
+            email_sent = ses_manager.send_report(
+                file=delivery_df)
+            
+            logger.info(f"Email sent: {email_sent}")
+
 
         response = {
             "statusCode": 200,
-            "len_validation": f'extracted:{len(list_objects)} transformed:{len(final_df)}',
-            "counts_match": len(final_df) == len(list_objects),
-            "final_df": final_df.head(100).to_dict(orient='records'),
+            "len_validation": f'extracted:{len(list_objects)} transformed:{len(enriched_data)}',
+            "counts_match": len(enriched_data) == len(list_objects),
+            "enriched_data": enriched_data.head(100).to_dict(orient='records'),
+            "email_sent":str(email_sent),
             "body": json.dumps({
-                "transformed_files": transformed_files,
-                "message": f"Se transformaron {len(transformed_files)} de {len(uploaded_files)} archivos"
+                "transformed_files": s3_url,
+                "message": f"Se transformaron {len(s3_url)} de {len(uploaded_files)} archivos"
             })
         }
         

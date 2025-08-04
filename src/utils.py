@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup, Tag
 
 from config import config
 from logs.logger import logger
+from src.business_rules import (BusinessRuleEngine, DateFormatRule, CleanNumberRule, 
+                                ExcludeValueRule, NotNullRule, ColumnOrderRule)
 
 
 def get_url_scrape(url_key: str) -> str:
@@ -35,7 +37,6 @@ def get_url_scrape(url_key: str) -> str:
 
     return f"{base_url}{dd}-{mm}-{yyyy}"
 
-
 def get_date_update() -> datetime:
     """
     Obtiene la fecha de ayer para usar en los registros.
@@ -44,8 +45,7 @@ def get_date_update() -> datetime:
         Objeto datetime con la fecha de ayer.
     """
     yesterday = datetime.now() - timedelta(days=1)
-    return yesterday
-    
+    return yesterday  
 
 def parse_total_expected(text: str) -> int:
     """
@@ -66,7 +66,6 @@ def parse_total_expected(text: str) -> int:
         return total_expected
     else:
         raise ValueError(f"No se pudo parsear el número de registros desde el texto: '{text}'")
-
 
 def extract_metadata(row: Tag) -> Tuple[str, str, str, str, str]:
     """
@@ -119,44 +118,6 @@ def extract_metadata(row: Tag) -> Tuple[str, str, str, str, str]:
 
     return number_part,dv_part, razon_social, url_pdf, cve
     
-
-def jsonl_to_parquet(jsonl_path: str, parquet_path: str) -> bool:
-    """
-    Convierte un archivo JSONL a formato Parquet.
-    
-    Args:
-        jsonl_path: Ruta al archivo JSONL de origen.
-        parquet_path: Ruta donde se guardará el archivo Parquet.
-        
-    Returns:
-        True si la conversión fue exitosa, False en caso contrario.
-        
-    Raises:
-        No lanza excepciones directamente, captura y registra errores internamente.
-    """
-    try:
-        records: List[Dict[str, Any]] = []
-        with open(jsonl_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                if line.strip():
-                    records.append(json.loads(line.strip()))
-        
-        if not records:
-            logger.warning(f"No se encontraron registros en {jsonl_path}")
-            return False
-        
-        df = pd.DataFrame(records)
-        df.to_parquet(parquet_path, index=False)
-        logger.info(f"Archivo {jsonl_path} convertido a {parquet_path} con {len(records)} registros")
-        return True
-        
-    except (IOError, json.JSONDecodeError) as e:
-        logger.error(f"Error al leer o decodificar {jsonl_path}: {e}")
-        return False
-    except Exception as e:
-        logger.error(f"Error al convertir {jsonl_path} a parquet: {e}")
-        return False
-
 def query_empresas(list_objects: List[Dict[str, Any]]) -> str:
     """
     Genera una consulta SQL para obtener datos de empresas basado en una lista de objetos.
@@ -311,12 +272,35 @@ def merge_data(list_objects, empresas, funcionarios):
             logger.warning(f"Se encontraron {duplicated_indices.sum()} filas duplicadas")
             final_df = final_df.drop_duplicates(subset=['original_index'])
 
-        columns_to_keep = ['fuente','rut', 'rut_df', 'razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
-                            'segmento', 'plataforma', 'ejec_cod', 'rut_funcionario', 'rut_funcionario_dv',
-                            'nombre_funcionario', 'nombre_puesto', 'correo', 'dependencia',
-                            'fecha', 'fecha_actuacion']
-
-        final_columns = [col for col in columns_to_keep if col in final_df.columns]
-        final_df = final_df[final_columns]
-
         return final_df
+    
+
+def reglas_de_negocio(df: pd.DataFrame, state: str = 'processed') -> pd.DataFrame:
+    """
+    Aplica reglas de negocio estandarizadas a un DataFrame.
+
+    Args:
+        df: DataFrame de pandas.
+
+    Returns:
+        DataFrame con las reglas de negocio aplicadas.
+    """
+    # Crear motor de reglas
+    engine = BusinessRuleEngine()
+    
+    # Reglas de formato
+    engine.add_rule(DateFormatRule(['fecha_actuacion', 'pa_date']))
+    engine.add_rule(CleanNumberRule(['nro_atencion']))
+    columns_to_keep = config.get("columns.all")
+
+    if state == 'delivery' :
+        
+        # Reglas de filtrado
+        engine.add_rule(ExcludeValueRule('actuacion', ['CONSTITUCIÓN']))
+        engine.add_rule(NotNullRule(['segmento', 'rut']))
+
+        columns_to_keep = config.get("columns.delivery")
+    
+    engine.add_rule(ColumnOrderRule(columns_to_keep))
+    
+    return engine.apply_all(df)

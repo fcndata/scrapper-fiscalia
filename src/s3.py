@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 
 from config import config
 from logs.logger import logger
-from src.glue import GlueManager
+
 
 
 
@@ -47,7 +47,7 @@ class S3Manager:
         """
         today = datetime.now()
         clean_path = self.s3_base_path.strip('/')
-        self.raw_path = f"{clean_path}/raw//pa_date={today.strftime('%Y-%m-%d')}/"
+        self.raw_path = f"{clean_path}/raw/pa_date={today.strftime('%Y-%m-%d')}/"
         self.processed_path = f"{clean_path}/processed/pa_date={today.strftime('%Y-%m-%d')}/"
 
     def upload_raw(self) -> List[str]:
@@ -158,27 +158,47 @@ class S3Manager:
     
     def upload_processed(self, df: pd.DataFrame) -> Optional[str]:
         """
-        Sube un DataFrame directamente a S3 en formato Parquet.
+        Sube un DataFrame particionado por pa_date a S3 en formato Parquet.
         
         Args:
-            df: DataFrame de pandas a subir.
-            filename: Nombre base del archivo (sin extensión).
+            df: DataFrame con columna pa_date.
             
         Returns:
-            URL de S3 del archivo subido o None si hubo un error.
+            URL base de S3 o None si error.
         """
-        if df.empty:
-            logger.warning("DataFrame vacío, no se subirá a S3")
+        if df.empty :
+            logger.warning("DataFrame vacío")
+            return None
+        elif 'pa_date' not in df.columns:
+            logger.warning("Sin pa_date")
             return None
             
-        try:
-            glue_manager = GlueManager()
-            s3_url = glue_manager.write_partitioned_data(df)
-            if s3_url:
-                return s3_url
-    
+        try:            
+            # Agrupar por pa_date y escribir cada partición
+            for pa_date, group_df in df.groupby('pa_date'):
+                file_key = f"{self.s3_base_path.strip('/')}/processed/pa_date={pa_date}/processed_data.parquet"
+                
+                # Convertir a Parquet en memoria
+                buffer = BytesIO()
+                group_df.to_parquet(buffer, compression='snappy', index=False)
+                buffer.seek(0)
+                
+                # Subir a S3
+                self.s3_client.put_object(
+                    Bucket=self.bucket_name,
+                    Key=file_key,
+                    Body=buffer.getvalue(),
+                    ContentType='application/octet-stream'
+                )
+                
+                logger.info(f"Partición pa_date={pa_date} escrita: {len(group_df)} registros")
+            
+            base_s3_path = f"s3://{self.bucket_name}/{self.s3_base_path.strip('/')}/processed"
+            logger.info(f"DataFrame particionado escrito en {base_s3_path}")
+            return base_s3_path
+            
         except Exception as e:
-            logger.warning(f"Error uploading DataFrame to S3: {e}")
+            logger.error(f"Error escribiendo datos particionados: {e}")
             return None
 
     def download_processed(self, local_path: str) -> bool:
