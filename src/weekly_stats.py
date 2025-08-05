@@ -69,7 +69,7 @@ class WeeklyStatsManager:
                 else:
                     dict_stats = retrive_stats(date)
                     stats_of_the_week[day]['sociedad'] = dict_stats.get('empresa', 0)
-                    stats_of_the_week[day]['diario'] = dict_stats.get('diario', 0)
+                    stats_of_the_week[day]['diario'] = dict_stats.get('diario_oficial', 0)
 
             logger.info(f"Estadísticas semanales generadas")
             return stats_of_the_week
