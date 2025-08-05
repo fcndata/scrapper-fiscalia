@@ -156,7 +156,7 @@ class S3Manager:
             logger.error(f"Error during consolidation from raw path: {e}")
             return []
     
-    def upload_processed(self, df: pd.DataFrame) -> Optional[str]:
+    def upload_processed(self, df: pd.DataFrame, state: str = 'processed') -> Optional[str]:
         """
         Sube un DataFrame particionado por pa_date a S3 en formato Parquet.
         
@@ -176,7 +176,7 @@ class S3Manager:
         try:            
             # Agrupar por pa_date y escribir cada partición
             for pa_date, group_df in df.groupby('pa_date'):
-                file_key = f"{self.s3_base_path.strip('/')}/processed/pa_date={pa_date}/processed_data.parquet"
+                file_key = f"{self.s3_base_path.strip('/')}/{state}/pa_date={pa_date}/processed_data.parquet"
                 
                 # Convertir a Parquet en memoria
                 buffer = BytesIO()
@@ -193,7 +193,7 @@ class S3Manager:
                 
                 logger.info(f"Partición pa_date={pa_date} escrita: {len(group_df)} registros")
             
-            base_s3_path = f"s3://{self.bucket_name}/{self.s3_base_path.strip('/')}/processed"
+            base_s3_path = f"s3://{self.bucket_name}/{self.s3_base_path.strip('/')}/{state}"
             logger.info(f"DataFrame particionado escrito en {base_s3_path}")
             return base_s3_path
             

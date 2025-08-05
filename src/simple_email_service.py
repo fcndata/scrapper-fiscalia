@@ -7,6 +7,7 @@ from typing import List, Union, Tuple, Any
 from config import config
 import io
 from datetime import datetime
+from src.weekly_stats import WeeklyStatsManager
 
 
 class SESManager:
@@ -78,15 +79,28 @@ class SESManager:
             msg['To'] = ', '.join(config.get("email.to", ))
             msg['Subject'] = config.get("email.subject", 'Report:')
             
+            # Obtener estadísticas semanales
+            stats_manager = WeeklyStatsManager(
+                bucket_name=config.get('aws.s3_bucket'),
+                s3_base_path=config.get('aws.s3_name')
+            )
+            weekly_stats = stats_manager.get_weekly_stats()
+            weekly_summary = stats_manager.format_weekly_summary(weekly_stats)
+            
             # Email body
             record_count = len(file) if hasattr(file, '__len__') else "N/A"
             body = f"""
-            {config.get('email.body','')}
-            
-            Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            Registros procesados: {record_count}
-            
-            Adjunto encontrarás el archivo con los datos extraídos.
+{config.get('email.body','')}
+
+{weekly_summary}
+
+═══════════════════════════════════
+EJECUCIÓN ACTUAL:
+• Fecha: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}
+• Registros procesados hoy: {record_count}
+• Stats del Json: {weekly_stats}
+
+Adjunto encontrarás el archivo con los datos extraídos.
             """
             
             msg.attach(MIMEText(body, 'plain'))

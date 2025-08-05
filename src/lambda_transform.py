@@ -49,13 +49,15 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
 
             upload_df = reglas_de_negocio(enriched_data, state='processed')
 
-            s3_url = s3_manager.upload_processed(upload_df)
-
-            logger.info(f"DataFrame transformado y subido a S3: {s3_url}")
+            s3_url = s3_manager.upload_processed(df = upload_df, state = 'processed')
             
             ses_manager = SESManager()
 
             delivery_df = reglas_de_negocio(enriched_data, state='delivery')
+
+            s3_url = s3_manager.upload_processed(df = delivery_df, state = 'delivery')
+
+            logger.info(f"DataFrame transformado y subido a S3: {s3_url}")
 
             email_sent = ses_manager.send_report(
                 file=delivery_df)
