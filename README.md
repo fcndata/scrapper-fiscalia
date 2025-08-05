@@ -1,4 +1,4 @@
-# SCRAPER FISCALÍA
+# Proyecto Modificación de Sociedades
 
 ## Propósito
 Este proyecto implementa un sistema completo de extracción, transformación y enriquecimiento de datos de empresas y sociedades desde fuentes oficiales chilenas. El sistema extrae datos del Registro de Empresas y Sociedades y del Diario Oficial, los enriquece con información de bases de datos corporativas (empresas y funcionarios), y genera datasets consolidados para análisis empresarial.
@@ -12,6 +12,8 @@ Este proyecto implementa un sistema completo de extracción, transformación y e
 - **DiarioScraper**: Implementación para extraer datos del Diario Oficial.
 - **S3Manager**: Gestiona operaciones de almacenamiento en AWS S3 con estructura jerárquica por fecha.
 - **AthenaManager**: Gestiona consultas a bases de datos corporativas via AWS Athena.
+- **WeeklyStatsManager**: Genera estadísticas semanales desde archivos Parquet almacenados en S3.
+- **SESManager**: Gestiona envío de reportes automáticos por email con archivos adjuntos Excel.
 - **CompanyMetadata**: Modelo de datos Pydantic para validación y serialización.
 - **Config**: Singleton para gestionar la configuración del sistema.
 
@@ -21,6 +23,7 @@ scrapper-fiscalia/
 ├── .amazonq/rules/           # Reglas para Amazon Q
 ├── .devcontainer/            # Configuración del entorno de desarrollo
 ├── .lambdacontainer/         # Configuración para despliegue en AWS Lambda
+├── .zip/                     # Layers para Lambda y codigo encapsulado para el transform de la lambda
 ├── config/                   # Configuración del sistema
 ├── data/                     # Datos extraídos (ejemplo)
 ├── logs/                     # Sistema de logging
@@ -30,6 +33,8 @@ scrapper-fiscalia/
 │   ├── s3.py                 # Gestión de almacenamiento en S3
 │   ├── models.py             # Modelos de datos
 │   ├── athena.py             # Gestión de consultas Athena
+│   ├── weekly_stats.py       # Generación de estadísticas semanales
+│   ├── simple_email_service.py # Sistema de notificaciones por email
 │   ├── lambda.py             # Handler para AWS Lambda (extracción)
 │   └── lambda_transform.py   # Handler para AWS Lambda (transformación)
 └── trigger.py                # Punto de entrada principal
@@ -58,6 +63,15 @@ scrapper-fiscalia/
   - Eliminación de duplicados y validación de integridad
 - **Salida**: DataFrame consolidado subido a S3 en formato Parquet
 
+### 3. Sistema de Reportes Automáticos
+- **Entrada**: Archivos Parquet procesados en S3
+- **Proceso**:
+  - Generación de estadísticas semanales por fuente
+  - Creación de tabla formateada con conteos diarios
+  - Conversión de datos a formato Excel para adjuntar
+  - Composición de email HTML con formato profesional
+- **Salida**: Email automático con estadísticas y archivo Excel adjunto
+
 ### 3. Estructura de Datos Final
 El dataset final incluye:
 - **Datos originales**: RUT, razón social, URL, actuación, CVE, fechas
@@ -73,8 +87,12 @@ El dataset final incluye:
 - **Pydantic**: Validación de datos y serialización
 
 ### AWS y Base de Datos
-- **Boto3**: Interacción con servicios AWS (S3, Athena)
+- **Boto3**: Interacción con servicios AWS (S3, Athena, SES)
 - **PyAthena**: Cliente específico para consultas Athena
+
+### Sistema de Reportes
+- **Email**: MIME para composición de emails HTML con adjuntos
+- **Openpyxl**: Generación de archivos Excel para reportes
 
 ### Configuración y Utilidades
 - **PyYAML**: Manejo de configuración
@@ -102,6 +120,14 @@ aws:
   s3_name: 'scraper/fiscalia'
   region: 'us-east-1'
   athena_maestro_empresa: 'database.table'
+
+email:
+  from: 'sender@company.com'
+  to: ['recipient1@company.com', 'recipient2@company.com']
+  subject: 'Reporte Semanal - Scraper Fiscalía'
+  body: 'Estimados,\n\nAdjunto el reporte semanal del sistema.'
+  signature: 'Equipo de Datos'
+  file_name: 'reporte_fiscalia'
 ```
 
 ## Uso
@@ -133,12 +159,17 @@ python src/lambda_transform.py
 
 ### Estructura de Datos en S3
 ```
-s3://bucket/scraper/fiscalia/YYYYMMDD/
+s3://bucket/scraper/fiscalia/
 ├── raw/
-│   ├── empresa_scraper.jsonl
-│   └── diario_scraper.jsonl
-└── processed/
-    └── empresas_enriquecidas_YYYYMMDD_HHMMSS.parquet
+│   └── pa_date=YYYY-MM-DD/
+│       ├── empresa_scraper.jsonl
+│       └── diario_scraper.jsonl
+├── processed/
+│   └── pa_date=YYYY-MM-DD/
+|       └── processed_data.parquet
+└── delivery/
+    └── pa_date=YYYY-MM-DD/
+        └── processed_data.parquet
 ```
 
 ## Características Avanzadas
@@ -164,15 +195,36 @@ s3://bucket/scraper/fiscalia/YYYYMMDD/
 - ✅ Extracción automatizada de dos fuentes oficiales
 - ✅ Enriquecimiento con datos corporativos
 - ✅ Sistema de logging completo
-- ✅ Integración completa con AWS (S3, Athena)
+- ✅ Integración completa con AWS (S3, Athena, SES)
 - ✅ Validación y limpieza de datos
 - ✅ Formato Parquet para consultas eficientes
+- ✅ Sistema de reportes automáticos por email
+- ✅ Estadísticas semanales con formato HTML
+- ✅ Generación automática de archivos Excel
 - ✅ Preparado para despliegue en AWS Lambda
 
 ### Métricas de Rendimiento
 - Procesamiento de ~1100 registros por ejecución
 - Tiempo de ejecución: ~2-3 minutos por Lambda
 - Tasa de éxito de enriquecimiento: >95%
+- Generación de reportes semanales en <30 segundos
+- Envío automático de emails con adjuntos Excel
+
+## Sistema de Reportes
+
+### Características del Reporte Semanal
+- **Periodo**: Lunes a domingo (semana actual o anterior si es lunes)
+- **Métricas**: Conteo diario por fuente (Diario Oficial y Registro de Empresas)
+- **Formato**: Tabla HTML con totales semanales
+- **Adjuntos**: Archivo Excel con datos procesados
+- **Automatización**: Envío programado vía AWS SES
+
+### Estructura del Email
+- **Encabezado**: Configuración personalizable del asunto y remitente
+- **Cuerpo**: Mensaje HTML con tabla de estadísticas formateada
+- **Formato**: Texto en negrita para elementos importantes
+- **Adjunto**: Excel con datos completos del periodo
+- **Firma**: Firma personalizable del equipo
 
 ## Limitaciones Conocidas
 
@@ -180,3 +232,5 @@ s3://bucket/scraper/fiscalia/YYYYMMDD/
 - Limitaciones de rate limiting en consultas Athena
 - Requiere conexión estable a internet para scraping
 - Formato de páginas web puede cambiar requiriendo ajustes
+- Configuración de AWS SES requerida para envío de emails
+- Dependencia de estructura de archivos Parquet en S3 para reportes

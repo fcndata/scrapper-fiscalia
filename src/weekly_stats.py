@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Dict, List
+from datetime import datetime, timedelta
 import pandas as pd
 import boto3
 from io import BytesIO
@@ -22,8 +23,6 @@ class WeeklyStatsManager:
             Diccionario con estadísticas diarias por fuente.
         """
         try:
-            #%%
-            from datetime import datetime, timedelta
             def week():
                 today = datetime.now()
                 # Si es lunes, mostrar semana anterior completa
@@ -103,9 +102,15 @@ class WeeklyStatsManager:
             return "No hay datos disponibles para el reporte semanal."
         
         
+        # Definir anchos fijos para todas las columnas
+        col1_width = 35  # Día
+        col2_width = 16  # Diario Oficial  
+        col3_width = 20  # Registro de Empresa
+        col4_width = 8  # Total
+        
         # Encabezado de la tabla con anchos fijos
-        header = f"{'Día':<30}{'Diario Oficial':<50}{'Registro de Empresa':<75}{'Total':<85}"
-        separator = "═" * 90
+        header = f"{'Día':<{col1_width}}{'Diario Oficial':<{col2_width}}{'Registro de Empresa':<{col3_width}}{'Total':<{col4_width}}"
+        separator = "═" * (col1_width + col2_width + col3_width + col4_width)
         
         rows = []
         total_diario = 0
@@ -114,6 +119,7 @@ class WeeklyStatsManager:
         for day in stats.keys():
             sociedad = stats[day].get('sociedad')
             diario = stats[day].get('diario')
+            date = stats[day].get('date').strftime('%d-%m-\'%y')
 
             # Formatear valores (números o guiones)
             diario_str = f"{diario:,}" if isinstance(diario, int) and diario > 0 else str(diario)
@@ -128,12 +134,14 @@ class WeeklyStatsManager:
             else:
                 total_str = "-"
             
-            row = f"{day:<40}{diario_str:<16}{sociedad_str:<16}{total_str:<10}"
+            # Usar los mismos anchos que el header
+            row = f"{f'{day}: {date}':<{col1_width}}{diario_str:<{col2_width}}{sociedad_str:<{col3_width}}{total_str:<{col4_width}}"
             rows.append(row)
         
         # Fila de totales
         total_general = total_diario + total_sociedad
-        total_row = f"{'TOTAL SEMANAL':<40}{total_diario:<16,}{total_sociedad:<16,}{total_general:<10,}"
+        # Fila de totales con los mismos anchos
+        total_row = f"{'TOTAL SEMANAL':<{col1_width}}{total_diario:<{col2_width},}{total_sociedad:<{col3_width},}{total_general:<{col4_width},}"
         
         summary = f"""
 

@@ -87,23 +87,23 @@ class SESManager:
             weekly_stats = stats_manager.get_weekly_stats()
             weekly_summary = stats_manager.format_weekly_summary(weekly_stats)
             
-            # Email body
-            record_count = len(file) if hasattr(file, '__len__') else "N/A"
             body = f"""
+<p>
 {config.get('email.body','')}
-
+</p>
+<pre>
 {weekly_summary}
+</pre>
 
-═══════════════════════════════════
-EJECUCIÓN ACTUAL:
-• Fecha: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}
-• Registros procesados hoy: {record_count}
-• Stats del Json: {weekly_stats}
+<p>En el adjunto se encuentra el detalle de las modificaciones.</p>
 
-Adjunto encontrarás el archivo con los datos extraídos.
-            """
+<p>En caso de necesitar acceso a la tabla con los historicos, contactarse con el equipo de <b>Gestión de Datos</b>.</p>
+
+<p>{config.get('email.signature','FT')}</p>
+<p>Gerencia de <b>Inteligencia de Negocio</b> y <b>Analítica de Datos</b></p> 
+<p>Banco Estado</p>"""
             
-            msg.attach(MIMEText(body, 'plain'))
+            msg.attach(MIMEText(body, 'html'))
             
             # Attach file
             attachment = MIMEApplication(file_buffer.getvalue())

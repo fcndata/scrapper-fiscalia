@@ -23,8 +23,8 @@ email:
   to: ['facu_mt@hotmail.com']
   from: "ftoneguz@bancoestado.cl"
   subject: "Reporte: Modificación de sociedades"
-  body: 'Archivo que consolida la Modificación de Sociedades, el que incluye la información del Diario Oficial y del Registro de Empresas y Sociedades'
-  signature: 'Equipo de Analitica Avanzada - Banco Estado'
+  body: 'La tabla consolida las <b>Modificación de Sociedades</b> con información del <b>Diario Oficial</b> y <b>Registro de Empresas y Sociedades</b>'
+  signature: 'Equipo de Analitica Avanzada'
   file_name: "Modificacion_sociedades"
 
 columns:
