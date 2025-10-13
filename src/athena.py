@@ -6,7 +6,8 @@ import pandas as pd
 
 from config import config
 from logs.logger import logger
-from src.utils import query_empresas, query_funcionarios
+from src.utils import query_empresas, query_funcionarios, query_suf
+from src.models import CompanyMetadata, EmpresaData, FuncionarioData, SufData
 
 class AthenaManager:
     """
@@ -105,55 +106,90 @@ class AthenaManager:
         
         return df
     
-    def get_empresas_data(self, list_objects: Optional[List[Dict[str, Any]]] = None) -> pd.DataFrame:
+    def get_empresas_data(self, ruts: List[int]) -> List[EmpresaData]:
         """
         Obtiene los datos de la tabla maestro de empresas.
         
         Args:
-            list_objects: Lista de objetos con datos que incluyen RUTs para filtrar.
-                         Si es None, devuelve un DataFrame vacío.
+            ruts: Lista de RUTs para filtrar empresas.
         
         Returns:
-            DataFrame con los datos de empresas.
+            Lista de objetos EmpresaData.
         """
-        if not list_objects:
-            logger.warning("No se proporcionaron objetos para consultar datos de empresas")
-            return pd.DataFrame()
-            
-        return self.execute_query(query_empresas(list_objects), "bd_in_tablas_generales")
+        if not ruts:
+            logger.warning("No se proporcionaron RUTs para consultar empresas")
+            return []
+        
+        # Convertir RUTs a formato dict para query_empresas
+        list_ruts = [rut for rut in ruts]
+        
+        df = self.execute_query(query_empresas(list_ruts), "bd_in_tablas_generales")
+        
+        # Convertir DataFrame a lista de EmpresaData
+        empresas_list = []
+        for _, row in df.iterrows():
+            try:
+                empresa = EmpresaData(**row.to_dict())
+                empresas_list.append(empresa)
+            except Exception as e:
+                logger.error(f"Error creando EmpresaData: {e}")
+                continue
+        
+        logger.info(f"Se obtuvieron {len(empresas_list)} registros de empresas")
+        return empresas_list
     
-    def get_funcionarios_data(self, empresas_df: pd.DataFrame) -> pd.DataFrame:
+    def get_funcionarios_data(self, ejec_codes: List[int]) -> List[FuncionarioData]:
         """
-        Obtiene los datos de la tabla base de funcionarios basado en los códigos de ejecutivo
-        de las empresas.
+        Obtiene los datos de la tabla base de funcionarios basado en códigos de ejecutivo.
         
         Args:
-            empresas_df: DataFrame con datos de empresas que incluye la columna 'ejec_cod'.
+            ejec_codes: Lista de códigos de ejecutivo.
         
         Returns:
-            DataFrame con los datos de funcionarios.
+            Lista de objetos FuncionarioData.
         """
-        if empresas_df.empty:
-            logger.warning("DataFrame de empresas vacío, no se pueden obtener funcionarios")
-            return pd.DataFrame()
+        if not ejec_codes:
+            logger.warning("No se proporcionaron códigos de ejecutivo")
+            return []
             
-        if 'ejec_cod' not in empresas_df.columns:
-            logger.warning("No se encontró la columna 'ejec_cod' en el DataFrame de empresas")
-            return pd.DataFrame()
-            
-        ejec_codes = empresas_df['ejec_cod'].dropna().unique().tolist()
-        logger.info(f"Códigos de ejecutivo únicos encontrados: {len(ejec_codes)}")
-        if ejec_codes:
-            logger.info(f"Primeros códigos de ejecutivo: {ejec_codes[:5]}")
-            
-        return self.execute_query(query_funcionarios(ejec_codes), "bd_dlk_bcc_tablas_generales")
+        logger.info(f"Códigos de ejecutivo únicos: {len(set(ejec_codes))}")
+        
+        df = self.execute_query(query_funcionarios(ejec_codes), "bd_dlk_bcc_tablas_generales")
+        
+        # Convertir DataFrame a lista de FuncionarioData
+        funcionarios_list = []
+        for _, row in df.iterrows():
+            try:
+                funcionario = FuncionarioData(**row.to_dict())
+                funcionarios_list.append(funcionario)
+            except Exception as e:
+                logger.error(f"Error creando FuncionarioData: {e}")
+                continue
+        
+        logger.info(f"Se obtuvieron {len(funcionarios_list)} registros de funcionarios")
+        return funcionarios_list
     
-    def get_sufs_data(self) -> pd.DataFrame:
+    def get_sufs_data(self, ruts: List[int]) -> List[SufData]:
         """
-        Obtiene todos los datos de la tabla SUFs.
+        Obtiene los RUTs de la tabla SUFs para filtrado.
         
         Returns:
-            DataFrame con los datos de SUFs.
+            Lista de RUTs que están en SUFs.
         """
-        query = 'SELECT * FROM "bd_in_gesdatos"."tbl_tsuf_pcp"'
-        return self.execute_query(query, "bd_in_gesdatos")
+        list_ruts = [rut for rut in ruts]
+        
+        df = self.execute_query(query_suf(list_ruts), "bd_in_gesdatos")
+        
+        # Convertir DataFrame a lista de EmpresaData
+        empresas_sufs = []
+        for _, row in df.iterrows():
+            try:
+                empresa = SufData(**row.to_dict())
+                empresas_sufs.append(empresa)
+            except Exception as e:
+                logger.error(f"Error creando SufData: {e}")
+                continue
+        
+        logger.info(f"Se obtuvieron {len(empresas_sufs)} RUTs únicos de SUFs")
+        
+        return empresas_sufs

@@ -61,7 +61,7 @@ def parse_total_expected(text: str) -> int:
     else:
         raise ValueError(f"No se pudo parsear el número de registros desde el texto: '{text}'")
 
-def extract_metadata(row: Tag) -> Tuple[str, str, str, str, str]:
+def extract_metadata(row: Tag) -> Tuple[int, str, str, str, str]:
     """
     Extrae los metadatos de una fila de la tabla del Diario Oficial.
     
@@ -69,7 +69,7 @@ def extract_metadata(row: Tag) -> Tuple[str, str, str, str, str]:
         row: Elemento BeautifulSoup que representa una fila de la tabla.
         
     Returns:
-        Tupla con (number_part, dv_part, razon_social, url_pdf, cve).
+        Tupla con (rut_int, dv_str, razon_social, url_pdf, cve).
         
     Raises:
         ValueError: Si no se puede extraer alguno de los campos requeridos.
@@ -91,7 +91,7 @@ def extract_metadata(row: Tag) -> Tuple[str, str, str, str, str]:
     
     if raw_rut:
         number_part, dv_part = raw_rut.split('-')
-        number_part = number_part.replace('.', '')
+        number_part = int(number_part.replace('.', ''))
     else:
         number_part, dv_part = None, None
     
@@ -112,36 +112,25 @@ def extract_metadata(row: Tag) -> Tuple[str, str, str, str, str]:
 
     return number_part,dv_part, razon_social, url_pdf, cve
     
-def query_empresas(list_objects: List[Dict[str, Any]]) -> str:
+def query_empresas(rut_list: List[int]) -> str:
     """
-    Genera una consulta SQL para obtener datos de empresas basado en una lista de objetos.
+    Genera una consulta SQL para obtener datos de empresas basado en una lista de RUTs.
     
     Args:
-        list_objects: Lista de diccionarios con datos de empresas, cada uno debe tener una clave 'rut'.
+        rut_list: Lista de RUTs para filtrar empresas.
         
     Returns:
-        Consulta SQL para obtener datos de empresas. Si no hay RUTs válidos, devuelve una consulta
-        que no retornará resultados.
-    """
-    rut_empresas = []
-    for item in list_objects:
-        rut = item.get('rut')
-        if rut:
-            try:
-                rut_empresas.append(int(rut))
-            except (ValueError, TypeError):
-                logger.warning(f"RUT no válido para conversión a entero: {rut}")
-    
-    # Si no hay RUTs válidos, devolver una consulta que no retornará resultados
-    if not rut_empresas:
+        Consulta SQL para obtener datos de empresas.
+    """   
+    if not rut_list:
         logger.warning("No se encontraron RUTs válidos para consultar empresas")
         return "SELECT rut_cliente, rut_cliente_dv, segmento, plataforma, ejec_cod, fecha_proceso FROM \"bd_in_tablas_generales\".\"tbl_maestro_empresas\" WHERE 1=0"
-
+        
+    logger.info(f"Consultando datos para {len(rut_list)} RUTs válidos")
+    
     # Formatear la lista de RUTs para la consulta SQL
-    rut_list = f"({', '.join(map(str, rut_empresas))})"
-    
-    logger.info(f"Consultando datos para {len(rut_empresas)} RUTs válidos")
-    
+    rut_str = f"({', '.join(map(str, rut_list))})"
+        
     custom_query = f'''
             WITH RankedEmpresas AS (
                 SELECT 
@@ -153,7 +142,7 @@ def query_empresas(list_objects: List[Dict[str, Any]]) -> str:
                     fecha_proceso,
                     ROW_NUMBER() OVER (PARTITION BY rut_cliente ORDER BY fecha_proceso DESC) as rn
                 FROM "bd_in_tablas_generales"."tbl_maestro_empresas"
-                WHERE rut_cliente IN {rut_list}
+                WHERE rut_cliente IN {rut_str}
                 )
                 SELECT 
                 rut_cliente,
@@ -167,36 +156,29 @@ def query_empresas(list_objects: List[Dict[str, Any]]) -> str:
             '''
     return custom_query
 
-def query_funcionarios(ejec_code: List) -> str:
+def query_funcionarios(ejec_codes: List[int]) -> str:
     """
-    Genera una consulta SQL para obtener datos de funcionarios basado en los códigos de ejecutivo
-    de las empresas.
+    Genera una consulta SQL para obtener datos de funcionarios basado en códigos de ejecutivo.
     
     Args:
-        ejec_code: Lista de códigos de ejecutivo para filtrar los funcionarios.
+        ejec_codes: Lista de códigos de ejecutivo para filtrar funcionarios.
         
     Returns:
-        Consulta SQL para obtener datos de funcionarios. Si no hay códigos de ejecutivo válidos,
-        devuelve una consulta que no retornará resultados.
+        Consulta SQL para obtener datos de funcionarios.
     """
-    # Formatear y validar códigos de ejecutivo
-    valid_codes = [str(code) for code in ejec_code if code is not None]
-    
-    if not valid_codes:
-        logger.warning("Todos los códigos de ejecutivo eran nulos") 
+    if not ejec_codes:
+        logger.warning("No se proporcionaron códigos de ejecutivo")
         return "SELECT rut_funcionario, rut_funcionario_dv, nombre_funcionario, nombre_puesto, correo, dependencia, fecha_carga_dl, ejc_cod FROM \"bd_dlk_bcc_tablas_generales\".\"tbl_base_funcionarios\" WHERE 1=0"
     
-    # Crear la lista de códigos formateados para SQL
-    formatted_codes = [f"'{code}'" for code in valid_codes]
-    ejec_list = "(" + ", ".join(formatted_codes) + ")"
     
-    logger.info(f"Buscando funcionarios para {len(valid_codes)} códigos de ejecutivo válidos")
+    formatted_codes = [f"'{str(code)}'" for code in ejec_codes if code is not None]
+
+    ejec_list = "(" + ", ".join(formatted_codes) + ")"
     
     custom_query = f'''       
             WITH EjecutivosRUT AS (
                 SELECT 
                     ejc_cod,
-                    -- Convertir ejc_rut a string y eliminar ceros iniciales
                     TRIM(LEADING '0' FROM CAST(ejc_rut AS VARCHAR)) AS ejc_rut_trim
                 FROM "bd_dlk_bcc_tablas_generales"."tbl_codigo_ejecutivo"
                 WHERE ejc_cod IN {ejec_list}
@@ -229,6 +211,20 @@ def query_funcionarios(ejec_code: List) -> str:
             '''
     return custom_query
 
+def query_sufs(rut_list: List[int]) -> str:
+    """
+    Genera consulta SQL para obtener RUTs únicos de la tabla SUFs.
+    
+    Returns:
+        Consulta SQL para obtener RUTs de SUFs.
+    """
+    if not rut_list:
+        logger.warning("No se proporcionaron RUTs")
+        return "SELECT DISTINCT cli_rut FROM \"bd_in_gesdatos\".\"tbl_tsuf_pcp\" WHERE 1=0"
+    
+    rut_str = f"({', '.join(map(str, rut_list))})"
+
+    return f'SELECT DISTINCT cli_rut FROM "bd_in_gesdatos"."tbl_tsuf_pcp" WHERE cli_rut IN {rut_str}'
 
 def merge_data(list_objects, empresas, funcionarios):
 
@@ -236,10 +232,10 @@ def merge_data(list_objects, empresas, funcionarios):
         raw_df['original_index'] = range(len(raw_df))
 
         if 'rut' in raw_df.columns:
-            raw_df['rut'] = raw_df['rut'].astype(str)
+            raw_df['rut'] = raw_df['rut'].astype(int)
         
         if 'rut_cliente' in empresas.columns:
-            empresas['rut_cliente'] = empresas['rut_cliente'].astype(str)
+            empresas['rut_cliente'] = empresas['rut_cliente'].astype(int)
         
         if 'ejec_cod' in empresas.columns:
             empresas['ejec_cod'] = empresas['ejec_cod'].astype(str)

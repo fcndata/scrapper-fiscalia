@@ -408,7 +408,7 @@ class SociedadScraper(BaseScraper):
                 # Construcción del objeto
                 obj = CompanyMetadata(
                     fuente = 'empresa',
-                    rut=number_part.replace('.',''),
+                    rut=int(number_part.replace('.','')) if number_part else None,
                     rut_df=dv_part,
                     razon_social=cols[4],
                     url=self.driver.current_url,

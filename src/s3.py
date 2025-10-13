@@ -10,6 +10,7 @@ from botocore.exceptions import ClientError
 
 from config import config
 from logs.logger import logger
+from src.models import CompanyMetadata
 
 
 
@@ -92,12 +93,12 @@ class S3Manager:
         
         return uploaded_files
     
-    def download_raw(self) -> List[Dict[str, Any]]:
+    def download_raw(self) -> List[CompanyMetadata]:
         """
-        Descarga y consolida todos los archivos JSONL de la ruta raw en S3 en una lista de diccionarios.
+        Descarga y consolida todos los archivos JSONL de la ruta raw en S3 en objetos CompanyMetadata.
         
         Returns:
-            Lista de diccionarios con los datos consolidados de todos los archivos JSONL.
+            Lista de objetos CompanyMetadata con los datos consolidados de todos los archivos JSONL.
             Lista vacía si no se encontraron archivos o hubo errores.
         """
         try:
@@ -121,7 +122,7 @@ class S3Manager:
                 
             logger.info(f"Found {len(jsonl_files)} JSONL files to consolidate")
             
-            # Consolidar registros directamente en memoria como diccionarios
+            # Consolidar registros como objetos CompanyMetadata
             all_records = []
             
             for s3_key in jsonl_files:
@@ -130,14 +131,19 @@ class S3Manager:
                     response = self.s3_client.get_object(Bucket=self.bucket_name, Key=s3_key)
                     content = response['Body'].read().decode('utf-8')
                     
-                    # Procesar cada línea JSON directamente como diccionario
+                    # Procesar cada línea JSON como objeto CompanyMetadata
                     for line in content.splitlines():
                         if line.strip():
                             try:
-                                record = json.loads(line)
-                                all_records.append(record)
+                                record_dict = json.loads(line)
+                                # Crear objeto CompanyMetadata con validación automática
+                                company_metadata = CompanyMetadata(**record_dict)
+                                all_records.append(company_metadata)
                             except json.JSONDecodeError as e:
                                 logger.error(f"Error decoding JSON in {s3_key}: {e}")
+                                continue
+                            except Exception as e:
+                                logger.error(f"Error creating CompanyMetadata from {s3_key}: {e}")
                                 continue
                     
                     logger.info(f"Processed {s3_key}, records so far: {len(all_records)}")
@@ -149,7 +155,7 @@ class S3Manager:
                     logger.error(f"Error processing {s3_key}: {e}")
                     continue
             
-            logger.info(f"Consolidated {len(all_records)} records from {len(jsonl_files)} files")
+            logger.info(f"Consolidated {len(all_records)} CompanyMetadata objects from {len(jsonl_files)} files")
             return all_records
 
         except Exception as e:
