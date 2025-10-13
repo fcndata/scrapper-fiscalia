@@ -17,6 +17,8 @@ aws:
   s3_bucket: 'v1-st-bech-inegocio-analitica-sandbox-zone'
   s3_name: 'scraper/fiscalia'
   region: 'us-east-1'
+  s3_bucket_gobierno: 'v3-bech-dl-prod-landing-zone'
+  s3_name_gobierno: 'shared_bucket/inteligencia_negocios'
   
 
 email:

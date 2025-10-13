@@ -1,8 +1,6 @@
 from datetime import datetime, date
 from typing import Dict, Optional, Any
-
 from pydantic import BaseModel, Field, field_validator
-
 
 class CompanyMetadata(BaseModel):
     """
@@ -56,7 +54,6 @@ class CompanyMetadata(BaseModel):
             "fecha_actuacion": self.fecha_actuacion.strftime("%Y-%m-%d %H:%M:%S")
         }
 
-
 class EmpresaData(BaseModel):
     """
     Modelo para datos de la tabla tbl_maestro_empresas.
@@ -87,7 +84,6 @@ class EmpresaData(BaseModel):
             return datetime.fromisoformat(v.replace('Z', '+00:00'))
         return v
 
-
 class SufData(BaseModel):
     """
     Modelo para datos de la tabla tbl_tsuf_pcp.
@@ -97,19 +93,7 @@ class SufData(BaseModel):
     cli_rut: int
     cli_rut_dv: str
     fecha_proceso: datetime
-    
-    @field_validator('cli_rut', pre=True)
-    def convert_cli_rut(cls, v):
-        """Convierte cli_rut de string a int."""
-        return int(v) if v and str(v).strip() else None
-
-    @field_validator('fecha_proceso', pre=True)
-    def convert_fecha_proceso(cls, v):
-        """Convierte fecha_proceso de string a datetime."""
-        if isinstance(v, str):
-            return datetime.fromisoformat(v.replace('Z', '+00:00'))
-        return v
-
+  
 
 class FuncionarioData(BaseModel):
     """
@@ -142,7 +126,7 @@ class FuncionarioData(BaseModel):
         if isinstance(v, str):
             return datetime.fromisoformat(v).date()
         return v
-
+    
 
 class EnrichedCompanyData(BaseModel):
     """

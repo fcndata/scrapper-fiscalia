@@ -2,7 +2,10 @@ import json
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Tuple, List, Dict, Any, Optional, Union
+from typing import Tuple, List, Dict, Any, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.models import CompanyMetadata, EmpresaData, FuncionarioData, EnrichedCompanyData
 
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
@@ -224,57 +227,92 @@ def query_sufs(rut_list: List[int]) -> str:
     
     rut_str = f"({', '.join(map(str, rut_list))})"
 
-    return f'SELECT DISTINCT cli_rut FROM "bd_in_gesdatos"."tbl_tsuf_pcp" WHERE cli_rut IN {rut_str}'
+    return f'SELECT DISTINCT cli_rut, cli_rut_dv, fecha_proceso FROM "bd_in_gesdatos"."tbl_tsuf_pcp" WHERE cli_rut IN {rut_str}'
 
-def merge_data(list_objects, empresas, funcionarios):
-
-        raw_df = pd.DataFrame(list_objects)
-        raw_df['original_index'] = range(len(raw_df))
-
-        if 'rut' in raw_df.columns:
-            raw_df['rut'] = raw_df['rut'].astype(int)
+def filter_enriched_by_sufs(enriched_df: pd.DataFrame, sufs_data: List['SufData']) -> pd.DataFrame:
+    """
+    Filtra DataFrame enriquecido manteniendo solo RUTs que están en SUFs.
+    
+    Args:
+        enriched_df: DataFrame con datos enriquecidos.
+        sufs_data: Lista de objetos SufData desde Athena.
         
-        if 'rut_cliente' in empresas.columns:
-            empresas['rut_cliente'] = empresas['rut_cliente'].astype(int)
-        
-        if 'ejec_cod' in empresas.columns:
-            empresas['ejec_cod'] = empresas['ejec_cod'].astype(str)
-        
-        if 'ejc_cod' in funcionarios.columns:
-            funcionarios['ejc_cod'] = funcionarios['ejc_cod'].astype(str)
+    Returns:
+        DataFrame filtrado que solo contiene RUTs presentes en SUFs.
+    """
+    # Crear set de RUTs válidos desde SUFs para lookup O(1)
+    valid_ruts = {suf.cli_rut for suf in sufs_data}
+    
+    # Filtrar DataFrame por RUTs válidos
+    filtered_df = enriched_df[enriched_df['rut'].isin(valid_ruts)]
+    
+    logger.info(f"Filtradas {len(filtered_df)} filas de {len(enriched_df)} usando SUFs")
+    return filtered_df
 
-        metadata = pd.merge(
-            empresas,
-            funcionarios,
-            left_on='ejec_cod',
-            right_on='ejc_cod',
-            how='left')
 
-        final_df = pd.merge(
-            metadata,
-            raw_df,
-            left_on='rut_cliente',
-            right_on='rut',
-            how='right')
+def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['EmpresaData'], funcionarios: List['FuncionarioData']) -> pd.DataFrame:
+    """
+    Combina datos de empresas con información corporativa y de funcionarios.
+    
+    Args:
+        companies: Lista de objetos CompanyMetadata extraídos.
+        empresas: Lista de objetos EmpresaData desde Athena.
+        funcionarios: Lista de objetos FuncionarioData desde Athena.
         
-        duplicated_indices = final_df['original_index'].duplicated()
-        if duplicated_indices.any():
-            logger.warning(f"Se encontraron {duplicated_indices.sum()} filas duplicadas")
-            final_df = final_df.drop_duplicates(subset=['original_index'])
-
-        return final_df
+    Returns:
+        DataFrame con datos combinados.
+    """
+    # Crear diccionarios de lookup con serialización
+    data_empresas = {}
+    for empresa in empresas:
+        serialized = empresa.model_dump()
+        data_empresas[serialized['rut_cliente']] = serialized
+    
+    data_funcionarios = {}
+    for funcionario in funcionarios:
+        serialized = funcionario.model_dump()
+        data_funcionarios[serialized['ejc_cod']] = serialized
+    
+    enriched_data = []
+    
+    for company in companies:
+        # Serializar datos originales
+        company_data = company.model_dump()
+        
+        # Buscar datos de empresa
+        empresa_data = data_empresas.get(company_data.get('rut')) if company_data.get('rut') else None
+        
+        # Buscar datos de funcionario usando ejec_cod de empresa
+        funcionario_data = None
+        if empresa_data and empresa_data.get('ejec_cod'):
+            funcionario_data = data_funcionarios.get(empresa_data.get('ejec_cod'))
+        
+        # Combinar todos los datos
+        enriched = {**company_data}
+        if empresa_data:
+            enriched.update({k: v for k, v in empresa_data.items() if k not in enriched})
+        if funcionario_data:
+            enriched.update({k: v for k, v in funcionario_data.items() if k not in enriched})
+        
+        enriched_data.append(enriched)
+    
+    logger.info(f"Enriquecidos {len(enriched_data)} registros de {len(companies)} originales")
+    return pd.DataFrame(enriched_data)
     
 
-def reglas_de_negocio(df: pd.DataFrame, state: str = 'processed') -> pd.DataFrame:
+def reglas_de_negocio(data: pd.DataFrame, state: str = 'processed') -> pd.DataFrame:
     """
     Aplica reglas de negocio estandarizadas a un DataFrame.
 
     Args:
-        df: DataFrame de pandas.
+        data: DataFrame de pandas.
+        state: Estado del procesamiento ('processed' o 'delivery').
 
     Returns:
         DataFrame con las reglas de negocio aplicadas.
     """
+    df = data.copy()
+    
     # Crear motor de reglas
     engine = BusinessRuleEngine()
     
@@ -283,12 +321,10 @@ def reglas_de_negocio(df: pd.DataFrame, state: str = 'processed') -> pd.DataFram
     engine.add_rule(CleanNumberRule(['nro_atencion']))
     columns_to_keep = config.get("columns.all")
 
-    if state == 'delivery' :
-        
+    if state == 'processed':
         # Reglas de filtrado
         engine.add_rule(ExcludeValueRule('actuacion', ['CONSTITUCIÓN']))
         engine.add_rule(NotNullRule(['segmento', 'rut']))
-
         columns_to_keep = config.get("columns.delivery")
     
     engine.add_rule(ColumnOrderRule(columns_to_keep))

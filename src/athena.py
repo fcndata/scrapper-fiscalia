@@ -6,7 +6,7 @@ import pandas as pd
 
 from config import config
 from logs.logger import logger
-from src.utils import query_empresas, query_funcionarios, query_suf
+from src.utils import query_empresas, query_funcionarios, query_sufs
 from src.models import CompanyMetadata, EmpresaData, FuncionarioData, SufData
 
 class AthenaManager:
@@ -138,18 +138,20 @@ class AthenaManager:
         logger.info(f"Se obtuvieron {len(empresas_list)} registros de empresas")
         return empresas_list
     
-    def get_funcionarios_data(self, ejec_codes: List[int]) -> List[FuncionarioData]:
+    def get_funcionarios_data(self, empresas: List[EmpresaData]) -> List[FuncionarioData]:
         """
         Obtiene los datos de la tabla base de funcionarios basado en códigos de ejecutivo.
         
         Args:
-            ejec_codes: Lista de códigos de ejecutivo.
+            empresas: Lista de objetos EmpresaData para extraer códigos de ejecutivo.
         
         Returns:
             Lista de objetos FuncionarioData.
         """
+        ejec_codes = [emp.ejec_cod for emp in empresas if emp.ejec_cod]
+        
         if not ejec_codes:
-            logger.warning("No se proporcionaron códigos de ejecutivo")
+            logger.warning("No se encontraron códigos de ejecutivo")
             return []
             
         logger.info(f"Códigos de ejecutivo únicos: {len(set(ejec_codes))}")
@@ -178,7 +180,7 @@ class AthenaManager:
         """
         list_ruts = [rut for rut in ruts]
         
-        df = self.execute_query(query_suf(list_ruts), "bd_in_gesdatos")
+        df = self.execute_query(query_sufs(list_ruts), "bd_in_gesdatos")
         
         # Convertir DataFrame a lista de EmpresaData
         empresas_sufs = []
