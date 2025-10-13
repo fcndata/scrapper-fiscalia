@@ -147,3 +147,13 @@ class AthenaManager:
             logger.info(f"Primeros códigos de ejecutivo: {ejec_codes[:5]}")
             
         return self.execute_query(query_funcionarios(ejec_codes), "bd_dlk_bcc_tablas_generales")
+    
+    def get_sufs_data(self) -> pd.DataFrame:
+        """
+        Obtiene todos los datos de la tabla SUFs.
+        
+        Returns:
+            DataFrame con los datos de SUFs.
+        """
+        query = 'SELECT * FROM "bd_in_gesdatos"."tbl_tsuf_pcp"'
+        return self.execute_query(query, "bd_in_gesdatos")

@@ -38,12 +38,6 @@ def get_url_scrape(url_key: str) -> str:
     return f"{base_url}{dd}-{mm}-{yyyy}"
 
 def get_date_update() -> datetime:
-    """
-    Obtiene la fecha de ayer para usar en los registros.
-    
-    Returns:
-        Objeto datetime con la fecha de ayer.
-    """
     yesterday = datetime.now() - timedelta(days=1)
     return yesterday  
 
