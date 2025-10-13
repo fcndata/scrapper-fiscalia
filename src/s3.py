@@ -207,6 +207,53 @@ class S3Manager:
             logger.error(f"Error escribiendo datos particionados: {e}")
             return None
 
+    def upload_gobierno(self, df: pd.DataFrame) -> Optional[str]:
+        """
+        Carga DataFrame a formato gobierno en S3.
+        
+        Args:
+            df: DataFrame con datos para gobierno.
+            
+        Returns:
+            URL de S3 o None si error.
+        """
+        if df.empty:
+            logger.warning("DataFrame vacío para gobierno")
+            return None
+            
+        try:
+            # Configuración específica para gobierno
+            bucket_gobierno = config.get("aws.s3_bucket_gobierno")
+            path_gobierno = config.get("aws.s3_name_gobierno")
+            file_gobierno = config.get("aws.s3_file_gobierno")
+            
+            # Generar nombre de archivo con fecha
+            date_str = pd.Timestamp.now().strftime('%Y%m%d')
+            file_name = f"{file_gobierno}_{date_str}.csv"
+            file_key = f"{path_gobierno.strip('/')}/{file_name}"
+            
+            # Convertir a CSV con separador ';'
+            buffer = BytesIO()
+            csv_content = df.to_csv(index=False, sep=';', encoding='utf-8')
+            buffer.write(csv_content.encode('utf-8'))
+            buffer.seek(0)
+            
+            # Subir a S3 gobierno
+            self.s3_client.put_object(
+                Bucket=bucket_gobierno,
+                Key=file_key,
+                Body=buffer.getvalue(),
+                ContentType='text/csv'
+            )
+            
+            s3_url = f"s3://{bucket_gobierno}/{file_key}"
+            logger.info(f"Archivo gobierno subido: {s3_url} ({len(df)} registros)")
+            return s3_url
+            
+        except Exception as e:
+            logger.error(f"Error subiendo archivo gobierno: {e}")
+            return None
+
     def download_processed(self, local_path: str) -> bool:
         """
         Descarga y consolida todos los archivos JSONL de la ruta processed en S3 en un único archivo local.

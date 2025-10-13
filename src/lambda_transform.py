@@ -55,31 +55,30 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         filter_by_suf = filter_enriched_by_sufs(enriched_df, sufs)
         
         # Aplicar reglas de negocio
-
-        delivery_df = reglas_de_negocio(filter_by_suf, state='processed')
+        processed_df = reglas_de_negocio(filter_by_suf, state='processed')
         
         # Subir archivos procesados
-        processed_url = s3_manager.upload_processed(df=delivery_df, state='processed')
-        delivery_url = s3_manager.upload_processed(df=delivery_df, state='delivery')
+        processed_url = s3_manager.upload_processed(df=processed_df, state='processed')
+        gobierno_url = s3_manager.upload_gobierno(df=processed_df)
         
         # Enviar reporte
         ses_manager = SESManager()
-        email_sent = ses_manager.send_report(file=delivery_df)
+        email_sent = ses_manager.send_report(file=processed_df)
 
-        logger.info(f"Procesados: {processed_url}, Delivery: {delivery_url}")
+        logger.info(f"Procesados: {processed_url}")
+        logger.info(f"Gobierno: {gobierno_url}")
         logger.info(f"Email enviado: {email_sent}")
-
 
         response = {
             "statusCode": 200,
-            "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_df)} filtered:{len(final_df)}',
-            "sufs_filter_applied": len(final_df) < len(enriched_df),
-            "sample_data": final_df.head(5).to_dict(orient='records'),
-            "email_sent":str(email_sent),
+            "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_df)} filtered:{len(filter_by_suf)}',
+            "sufs_filter_applied": len(filter_by_suf) < len(enriched_df),
+            "sample_data": processed_df.head(5).to_dict(orient='records'),
+            "email_sent": str(email_sent),
             "body": json.dumps({
-                "processed_file": processed_url,
-                "delivery_file": delivery_url,
-                "message": f"Procesadas {len(final_df)} empresas con filtro SUFs"
+                "processed_file": processed_df,
+                "gobierno_file": gobierno_url,
+                "message": f"Procesadas {len(processed_df)} empresas con filtro SUFs"
             })
         }
         

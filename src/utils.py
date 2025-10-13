@@ -280,12 +280,12 @@ def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['Empr
         company_data = company.model_dump()
         
         # Buscar datos de empresa
-        empresa_data = data_empresas.get(company_data.get('rut')) if company_data.get('rut') else None
+        empresa_data = data_empresas.get(company_data['rut']) if company_data['rut'] else None
         
         # Buscar datos de funcionario usando ejec_cod de empresa
         funcionario_data = None
-        if empresa_data and empresa_data.get('ejec_cod'):
-            funcionario_data = data_funcionarios.get(empresa_data.get('ejec_cod'))
+        if empresa_data and empresa_data['ejec_cod']:
+            funcionario_data = data_funcionarios.get(empresa_data['ejec_cod'])
         
         # Combinar todos los datos
         enriched = {**company_data}
