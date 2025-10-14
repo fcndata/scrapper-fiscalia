@@ -23,13 +23,6 @@ class CompanyMetadata(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
-    @field_validator('rut', pre=True)
-    def convert_rut(cls, v):
-        """Convierte rut de string a int si es necesario."""
-        if v is None:
-            return None
-        return int(v) if str(v).strip() else None
     
     def serialize(self) -> Dict[str, Any]:
         """
@@ -67,23 +60,6 @@ class EmpresaData(BaseModel):
     ejec_cod: int
     fecha_proceso: datetime
     
-    @field_validator('rut_cliente', pre=True)
-    def convert_rut_cliente(cls, v):
-        """Convierte rut_cliente de string a int."""
-        return int(v) if v and str(v).strip() else None
-    
-    @field_validator('ejec_cod', pre=True)
-    def convert_ejec_cod(cls, v):
-        """Convierte ejec_cod de string a int."""
-        return int(v) if v and str(v).strip() else None
-    
-    @field_validator('fecha_proceso', pre=True)
-    def convert_fecha_proceso(cls, v):
-        """Convierte fecha_proceso de string a datetime."""
-        if isinstance(v, str):
-            return datetime.fromisoformat(v.replace('Z', '+00:00'))
-        return v
-
 class SufData(BaseModel):
     """
     Modelo para datos de la tabla tbl_tsuf_pcp.
@@ -94,7 +70,6 @@ class SufData(BaseModel):
     cli_rut_dv: str
     fecha_proceso: datetime
   
-
 class FuncionarioData(BaseModel):
     """
     Modelo para datos de la tabla tbl_base_funcionarios.
@@ -110,24 +85,6 @@ class FuncionarioData(BaseModel):
     fecha_carga_dl: date
     ejc_cod: int
     
-    @field_validator('rut_funcionario', pre=True)
-    def convert_rut_funcionario(cls, v):
-        """Convierte rut_funcionario de string a int."""
-        return int(v) if v and str(v).strip() else None
-    
-    @field_validator('ejc_cod', pre=True)
-    def convert_ejc_cod(cls, v):
-        """Convierte ejc_cod de string a int."""
-        return int(v) if v and str(v).strip() else None
-    
-    @field_validator('fecha_carga_dl', pre=True)
-    def convert_fecha_carga_dl(cls, v):
-        """Convierte fecha_carga_dl de string a date."""
-        if isinstance(v, str):
-            return datetime.fromisoformat(v).date()
-        return v
-    
-
 class EnrichedCompanyData(BaseModel):
     """
     Modelo para el dataset final enriquecido.

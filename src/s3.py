@@ -245,6 +245,15 @@ class S3Manager:
                 Body=buffer.getvalue(),
                 ContentType='text/csv'
             )
+
+            # TEST
+            self.s3_client.put_object(
+                Bucket=config.get("aws.s3_bucket"),
+                Key=f"{config.get("aws.s3_name")}/test_folder/test_file_{date_str}.csv",
+                Body=buffer.getvalue(),
+                ContentType='text/csv'
+            )
+
             
             s3_url = f"s3://{bucket_gobierno}/{file_key}"
             logger.info(f"Archivo gobierno subido: {s3_url} ({len(df)} registros)")
