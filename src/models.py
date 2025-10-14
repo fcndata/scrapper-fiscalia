@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from typing import Dict, Optional, Any
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel
 
 class CompanyMetadata(BaseModel):
     """
@@ -18,7 +18,7 @@ class CompanyMetadata(BaseModel):
     actuacion: str
     nro_atencion: Optional[str]
     cve: str
-    pa_date: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
+    pa_date: str = datetime.now().strftime("%Y-%m-%d")
     fecha_actuacion: datetime
 
     class Config:
@@ -118,4 +118,3 @@ class EnrichedCompanyData(BaseModel):
     
     class Config:
         arbitrary_types_allowed = True
-
