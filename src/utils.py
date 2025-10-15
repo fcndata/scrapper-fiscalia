@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Tuple, List, Dict, Any, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.models import CompanyMetadata, EmpresaData, FuncionarioData, EnrichedCompanyData
+    from src.models import CompanyMetadata, EmpresaData, FuncionarioData, EnrichedCompanyData, SufData
+else:
+    from src.models import EnrichedCompanyData
 
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
@@ -229,7 +231,7 @@ def query_sufs(rut_list: List[int]) -> str:
 
     return f'SELECT DISTINCT cli_rut, cli_rut_dv, fecha_proceso FROM "bd_in_gesdatos"."tbl_tsuf_pcp" WHERE cli_rut IN {rut_str}'
 
-def filter_enriched_by_sufs(enriched_df: pd.DataFrame, sufs_data: List['SufData']) -> pd.DataFrame:
+def filter_enriched_by_sufs(enriched_objects: List['EnrichedCompanyData'], sufs_data: List['SufData']) -> pd.DataFrame:
     """
     Filtra DataFrame enriquecido manteniendo solo RUTs que están en SUFs.
     
@@ -243,14 +245,18 @@ def filter_enriched_by_sufs(enriched_df: pd.DataFrame, sufs_data: List['SufData'
     # Crear set de RUTs válidos desde SUFs para lookup O(1)
     valid_ruts = {suf.cli_rut for suf in sufs_data}
     
-    # Filtrar DataFrame por RUTs válidos
-    filtered_df = enriched_df[enriched_df['rut'].isin(valid_ruts)]
+    # Filtrar objetos por RUTs válidos
+    filtered_objects = [obj for obj in enriched_objects if obj.rut in valid_ruts]
     
-    logger.info(f"Filtradas {len(filtered_df)} filas de {len(enriched_df)} usando SUFs")
+    # Convertir a DataFrame
+    filtered_data = [obj.model_dump() for obj in filtered_objects]
+    filtered_df = pd.DataFrame(filtered_data)
+    
+    logger.info(f"Filtradas {len(filtered_df)} filas de {len(enriched_objects)} usando SUFs")
     return filtered_df
 
 
-def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['EmpresaData'], funcionarios: List['FuncionarioData']) -> pd.DataFrame:
+def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['EmpresaData'], funcionarios: List['FuncionarioData']) -> List['EnrichedCompanyData']:
     """
     Combina datos de empresas con información corporativa y de funcionarios.
     
@@ -265,20 +271,30 @@ def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['Empr
     # Crear diccionarios de lookup con serialización
     data_empresas = {}
     for empresa in empresas:
-        serialized = empresa.model_dump()
-        data_empresas[serialized['rut_cliente']] = serialized
-    
+        try:
+            serialized = empresa.model_dump(mode='json')
+            data_empresas[serialized['rut_cliente']] = serialized
+        except AttributeError as e:
+            logger.error(f"Error serializando empresa {empresa.rut_cliente}: {e} el type es {type(empresa)} y el contenido es {empresa.__dict__}")
+
     data_funcionarios = {}
     for funcionario in funcionarios:
-        serialized = funcionario.model_dump()
-        data_funcionarios[serialized['ejc_cod']] = serialized
-    
+        try:    
+            serialized = funcionario.model_dump(mode='json')
+            data_funcionarios[serialized['ejc_cod']] = serialized
+        except AttributeError as e:
+            logger.error(f"Error serializando funcionario {funcionario.rut_funcionario}: {e} el type es {type(funcionario)} y el contenido es {funcionario.__dict__}")
+
     enriched_data = []
     
     for company in companies:
         # Serializar datos originales
-        company_data = company.model_dump()
-        
+        try:
+            company_data = company.model_dump(mode='json')
+        except AttributeError as e:
+            logger.error(f"Error serializando empresa {company.rut}: {e} el type es {type(company)} y el contenido es {company.__dict__}")
+            continue
+
         # Buscar datos de empresa
         empresa_data = data_empresas.get(company_data['rut']) if company_data['rut'] else None
         
@@ -296,8 +312,18 @@ def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['Empr
         
         enriched_data.append(enriched)
     
-    logger.info(f"Enriquecidos {len(enriched_data)} registros de {len(companies)} originales")
-    return pd.DataFrame(enriched_data)
+    # Crear objetos EnrichedCompanyData
+    enriched_objects = []
+    for data in enriched_data:
+        try:
+            enriched_obj = EnrichedCompanyData(**data)
+            enriched_objects.append(enriched_obj)
+        except Exception as e:
+            logger.warning(f"Error creando EnrichedCompanyData: {e}")
+            continue
+    
+    logger.info(f"Enriquecidos {len(enriched_objects)} registros de {len(companies)} originales")
+    return enriched_objects
     
 
 def reglas_de_negocio(data: pd.DataFrame, state: str = 'processed') -> pd.DataFrame:

@@ -49,14 +49,14 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         sufs = athena_manager.get_sufs_data(ruts)
         
         # Enriquecer datos
-        enriched_df = enrich_company_data(companies, empresas, funcionarios)
+        enriched_objects = enrich_company_data(companies, empresas, funcionarios)
         
         # Filtrar por SUFs
-        filter_by_suf = filter_enriched_by_sufs(enriched_df, sufs)
+        df_filtered_by_suf = filter_enriched_by_sufs(enriched_objects, sufs)
         
         # Aplicar reglas de negocio
-        processed_df = reglas_de_negocio(filter_by_suf, state='processed')
-        
+        processed_df = reglas_de_negocio(df_filtered_by_suf, state='processed')
+
         # Subir archivos procesados
         processed_url = s3_manager.upload_processed(df=processed_df, state='processed')
         gobierno_url = s3_manager.upload_gobierno(df=processed_df)
@@ -71,8 +71,8 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
 
         response = {
             "statusCode": 200,
-            "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_df)} filtered:{len(filter_by_suf)}',
-            "sufs_filter_applied": len(filter_by_suf) < len(enriched_df),
+            "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_objects)} filtered:{len(df_filtered_by_suf)}',
+            "sufs_filter_applied": len(df_filtered_by_suf) < len(enriched_objects),
             "sample_data": processed_df.head(5).to_dict(orient='records'),
             "email_sent": str(email_sent),
             "body": json.dumps({
