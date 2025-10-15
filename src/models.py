@@ -55,9 +55,9 @@ class EmpresaData(BaseModel):
     """
     rut_cliente: int
     rut_cliente_dv: str
-    plataforma: str
-    segmento: str
-    ejec_cod: int
+    plataforma: Optional[str]
+    segmento: Optional[str]
+    ejec_cod: Optional[int]
     fecha_proceso: datetime
     
 class SufData(BaseModel):
@@ -78,12 +78,12 @@ class FuncionarioData(BaseModel):
     """
     rut_funcionario: int
     rut_funcionario_dv: str
-    nombre_funcionario: str
-    nombre_puesto: str
-    dependencia: str
-    correo: str
+    nombre_funcionario: Optional[str]
+    nombre_puesto: Optional[str]
+    dependencia: Optional[str]
+    correo: Optional[str]
     fecha_carga_dl: date
-    ejc_cod: int
+    ejc_cod: Optional[int]
     
 class EnrichedCompanyData(BaseModel):
     """
