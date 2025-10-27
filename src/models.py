@@ -1,6 +1,6 @@
 from datetime import datetime, date
-from typing import Dict, Optional, Any
-from pydantic import BaseModel
+from typing import Dict, Optional, Any, Union
+from pydantic import BaseModel, field_validator
 
 class CompanyMetadata(BaseModel):
     """
@@ -44,7 +44,7 @@ class CompanyMetadata(BaseModel):
             "nro_atencion": self.nro_atencion,
             "cve": self.cve,
             "pa_date": self.pa_date,
-            "fecha_actuacion": self.fecha_actuacion.strftime("%Y-%m-%d %H:%M:%S")
+            "fecha_actuacion": self.fecha_actuacion
         }
 
 class EmpresaData(BaseModel):
@@ -60,6 +60,11 @@ class EmpresaData(BaseModel):
     ejec_cod: Optional[int]
     fecha_proceso: datetime
     
+    @field_validator('rut_cliente_dv', mode='before')
+    @classmethod
+    def convert_rut_dv_to_str(cls, v):
+        return str(v) if v is not None else None
+    
 class SufData(BaseModel):
     """
     Modelo para datos de la tabla tbl_tsuf_pcp.
@@ -69,6 +74,11 @@ class SufData(BaseModel):
     cli_rut: int
     cli_rut_dv: str
     fecha_proceso: datetime
+    
+    @field_validator('cli_rut_dv', mode='before')
+    @classmethod
+    def convert_rut_dv_to_str(cls, v):
+        return str(v) if v is not None else None
   
 class FuncionarioData(BaseModel):
     """
@@ -84,6 +94,11 @@ class FuncionarioData(BaseModel):
     correo: Optional[str]
     fecha_carga_dl: date
     ejc_cod: Optional[int]
+    
+    @field_validator('rut_funcionario_dv', mode='before')
+    @classmethod
+    def convert_rut_dv_to_str(cls, v):
+        return str(v) if v is not None else None
     
 class EnrichedCompanyData(BaseModel):
     """

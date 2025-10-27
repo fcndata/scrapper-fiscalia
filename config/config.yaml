@@ -23,7 +23,7 @@ aws:
   
 
 email:
-  to: ['facu_mt@hotmail.com','ftoneguz@bancoestado.cl','xalvare1@bancoestado.cl']
+  to: ['ftoneguz@bancoestado.cl']
   from: "ftoneguz@bancoestado.cl"
   subject: "Reporte: Modificación de sociedades"
   body: 'La tabla consolida las <b>Modificación de Sociedades</b> con información del <b>Diario Oficial</b> y <b>Registro de Empresas y Sociedades</b>'
@@ -38,4 +38,4 @@ columns:
   
   delivery: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
             'segmento', 'plataforma', 'ejec_cod','nombre_funcionario', 'nombre_puesto', 
-            'correo', 'dependencia','pa_date']
+            'correo', 'dependencia','fecha_actuacion']

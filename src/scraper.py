@@ -415,7 +415,7 @@ class SociedadScraper(BaseScraper):
                     actuacion=cols[1],
                     nro_atencion=cols[3],
                     cve=cols[5],
-                    fecha_actuacion=datetime.strptime(cols[0].strip(), "%d-%m-%Y")
+                    fecha_actuacion=get_date_update()
                 )
 
                 data_objects.append(obj)
