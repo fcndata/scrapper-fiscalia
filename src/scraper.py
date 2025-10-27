@@ -456,7 +456,7 @@ class SociedadScraper(BaseScraper):
                 self.logger.warning(f"Validando URL key: {url_key} — Esperados: {total_expected}, Extraídos: {total_extracted}")
                 return False
         except Exception as e:
-            self.logger.error(f"Error durante la validación: {e}")
+            self.logger.error(f"Error durante la validación del archivo {url_key}: {e}")
             return False
 
 class DiarioScraper(BaseScraper):
