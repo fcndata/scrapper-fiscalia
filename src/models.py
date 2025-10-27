@@ -19,7 +19,7 @@ class CompanyMetadata(BaseModel):
     nro_atencion: Optional[str]
     cve: str
     pa_date: str = datetime.now().strftime("%Y-%m-%d")
-    fecha_actuacion: datetime
+    fecha_actuacion: str
 
     class Config:
         arbitrary_types_allowed = True
@@ -116,7 +116,7 @@ class EnrichedCompanyData(BaseModel):
     nro_atencion: Optional[str]
     cve: str
     pa_date: str
-    fecha_actuacion: datetime
+    fecha_actuacion: str
     
     # Campos de EmpresaData
     segmento: Optional[str] = None

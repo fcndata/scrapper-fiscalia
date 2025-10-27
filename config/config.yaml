@@ -6,7 +6,11 @@ scraper:
 urls: 
   sociedades: https://www.registrodeempresasysociedades.cl/Busqueda/ActuacionDetalle.aspx?TipoBusqueda=4&ParamBusqueda1=
   diario_oficial: https://www.diariooficial.interior.gob.cl/edicionelectronica/index.php?date=
-  
+
+cloudwatch:
+  log_group_lambda_extraction: 'aws/lambda/Lambda-Scraper'
+  log_group_lambda_transform: 'aws/lambda/lambda_scraper_transform'
+
 output:
   sociedades: /tmp/empresa_scraper.jsonl 
   diario_oficial: /tmp/diario_scraper.jsonl
@@ -20,15 +24,18 @@ aws:
   s3_bucket_gobierno: 'v3-bech-dl-prod-landing-zone'
   s3_name_gobierno: 'shared_bucket/inteligencia_negocios/tbl_fiscalia_sociedades'
   s3_file_gobierno: 'modificacion_sociedades'
-  
+
 
 email:
   to: ['ftoneguz@bancoestado.cl']
   from: "ftoneguz@bancoestado.cl"
   subject: "Reporte: Modificación de sociedades"
-  body: 'La tabla consolida las <b>Modificación de Sociedades</b> con información del <b>Diario Oficial</b> y <b>Registro de Empresas y Sociedades</b>'
+  body: 'Consolidado Modificación de Sociedades con información del Diario Oficial y Registro de Empresas y Sociedades'
   signature: 'Equipo de Analitica Avanzada'
   file_name: "Modificacion_sociedades"
+
+teams:
+  webhook_url: 'https://default189d9de00fef40509094e7cf9e6b3b.b5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0483e06bebfb4ddc910a1af203b0a019/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=m8iJRPiRMiNOD2LzFL9FIkcmrxmwo4yjGxP5CLeO7S8'
 
 columns:
   all: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
@@ -36,6 +43,6 @@ columns:
     'nombre_funcionario', 'nombre_puesto', 'correo', 'dependencia',
     'pa_date', 'fecha_actuacion']
   
-  delivery: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
+  gobierno: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',
             'segmento', 'plataforma', 'ejec_cod','nombre_funcionario', 'nombre_puesto', 
             'correo', 'dependencia','fecha_actuacion']

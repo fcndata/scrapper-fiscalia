@@ -5,7 +5,7 @@ from logs.logger import logger
 from src.s3 import S3Manager
 from src.athena import AthenaManager
 from src.utils import enrich_company_data, filter_enriched_by_sufs, reglas_de_negocio
-from src.simple_email_service import SESManager
+from src.simple_notification_service import SNSManager
 
 
 def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict[str, Any]:
@@ -59,22 +59,24 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
 
         # Subir archivos procesados
         processed_url = s3_manager.upload_processed(df=processed_df, state='processed')
-        gobierno_url = s3_manager.upload_gobierno(df=processed_df)
+
+        gobierno_df = reglas_de_negocio(df_filtered_by_suf, state='gobierno')
+
+        gobierno_url = s3_manager.upload_gobierno(df=gobierno_df)
 
         logger.info(f"Procesados: {processed_url}")
         logger.info(f"Gobierno: {gobierno_url}")
         
-        # Enviar reporte
-        #ses_manager = SESManager()
-        #email_sent = ses_manager.send_report(file=processed_df)
-        #logger.info(f"Email enviado: {email_sent}")
+        sns_manager = SNSManager()
+        email_sent = sns_manager.send_business_report()
+        logger.info(f"Email enviado: {email_sent}")
 
         response = {
             "statusCode": 200,
             "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_objects)} filtered:{len(df_filtered_by_suf)}',
             "sufs_filter_applied": len(df_filtered_by_suf) < len(enriched_objects),
-            "sample_data": processed_df.head(5).to_dict(orient='records'),
-            #"email_sent": str(email_sent),
+            "sample_data": processed_df.head(3).to_dict(orient='records'),
+            "gobierno_url": str(email_sent),
             "body": json.dumps({
                 "processed_file": processed_url,
                 "gobierno_file": gobierno_url,

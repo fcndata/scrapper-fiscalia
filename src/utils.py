@@ -42,9 +42,9 @@ def get_url_scrape(url_key: str) -> str:
 
     return f"{base_url}{dd}-{mm}-{yyyy}"
 
-def get_date_update() -> datetime:
-    yesterday = datetime.now() - timedelta(days=1)
-    return yesterday  
+def get_date_update() -> str:
+    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    return str(yesterday)
 
 def parse_total_expected(text: str) -> int:
     """
@@ -59,12 +59,13 @@ def parse_total_expected(text: str) -> int:
     Raises:
         ValueError: Si no se puede extraer el número de registros del texto.
     """
-    match = re.search(r"en\s+([\d,.]+)\s+registros", text)
-    if match:
-        total_expected = int(match.group(1).replace(",", "").replace(".", ""))
-        return total_expected
-    else:
+    numeros = re.findall(r"\d+(?:[.,]\d+)*", text)
+    
+    if not numeros:
         raise ValueError(f"No se pudo parsear el número de registros desde el texto: '{text}'")
+    
+    valores = [int(n.replace('.', '').replace(',', '')) for n in numeros]
+    return max(valores)
 
 def extract_metadata(row: Tag) -> Tuple[int, str, str, str, str]:
     """
@@ -345,14 +346,18 @@ def reglas_de_negocio(data: pd.DataFrame, state: str = 'processed') -> pd.DataFr
     # Reglas de formato
     engine.add_rule(DateFormatRule(['fecha_actuacion', 'pa_date']))
     engine.add_rule(CleanNumberRule(['nro_atencion']))
-    columns_to_keep = config.get("columns.all")
+    engine.add_rule(ExcludeValueRule('actuacion', ['CONSTITUCIÓN']))
+    engine.add_rule(NotNullRule(['segmento', 'rut']))
 
     if state == 'processed':
         # Reglas de filtrado
-        engine.add_rule(ExcludeValueRule('actuacion', ['CONSTITUCIÓN']))
-        engine.add_rule(NotNullRule(['segmento', 'rut']))
-        columns_to_keep = config.get("columns.delivery")
-    
-    engine.add_rule(ColumnOrderRule(columns_to_keep))
-    
+        columns_to_keep = config.get("columns.all")
+        engine.add_rule(ColumnOrderRule(columns_to_keep))
+
+    if state == 'gobierno':
+        # Reglas específicas para gobierno
+        columns_to_keep = config.get("columns.gobierno")
+        engine.add_rule(ColumnOrderRule(columns_to_keep))
+        
+
     return engine.apply_all(df)

@@ -47,7 +47,7 @@ class WeeklyStatsManager:
             
             def retrive_stats(date):
                 date_str = date.strftime('%Y-%m-%d')
-                s3_key = f"{self.s3_base_path.strip('/')}/delivery/pa_date={date_str}/processed_data.parquet"
+                s3_key = f"{self.s3_base_path.strip('/')}/processed/pa_date={date_str}/processed_data.parquet"
                 
                 try:
                     df = self._read_parquet_from_s3(s3_key)
@@ -87,30 +87,38 @@ class WeeklyStatsManager:
         except Exception as e:
             logger.error(f"Error leyendo {s3_key}: {e}")
             return None
-    
-    def format_weekly_summary(self, stats: Dict[str, Dict[str, int]]) -> str:
+
+    def format_weekly_summary(self, stats: Dict[str, Dict[str, int]], notification_service: str = 'sns') -> str:
         """
-        Formatea resumen semanal en tabla para email.
+        Formatea resumen semanal optimizado para Teams (45 caracteres max).
         
         Args:
             stats: Diccionario con estadísticas diarias por fuente.
             
         Returns:
-            String formateado con tabla semanal.
+            String formateado para Teams.
         """
         if not stats:
-            return "No hay datos disponibles para el reporte semanal."
+            return "No hay datos disponibles."
+                # Definir anchos fijos para todas las columnas
         
-        
-        # Definir anchos fijos para todas las columnas
-        col1_width = 35  # Día
-        col2_width = 16  # Diario Oficial  
-        col3_width = 20  # Registro de Empresa
-        col4_width = 8  # Total
-        
-        # Encabezado de la tabla con anchos fijos
-        header = f"{'Día':<{col1_width}}{'Diario Oficial':<{col2_width}}{'Registro de Empresa':<{col3_width}}{'Total':<{col4_width}}"
-        separator = "═" * (col1_width + col2_width + col3_width + col4_width)
+        if notification_service == 'sns':
+            # Usar formato con separadores para Teams
+            separator = "═" * 45
+            header = "Día       | Diario     | Empresa     | Total"
+            # Verificar que el header tenga 45 caracteres
+            if len(header) < 45:
+                header = header.ljust(45)
+        else:
+            # Definir anchos fijos para todas las columnas
+            col1_width = 35  # Día
+            col2_width = 16  # Diario Oficial  
+            col3_width = 20  # Registro de Empresa
+            col4_width = 8  # Total
+            
+            # Encabezado de la tabla con anchos fijos
+            header = f"{'Día':<{col1_width}}{'Diario Oficial':<{col2_width}}{'Registro de Empresa':<{col3_width}}{'Total':<{col4_width}}"
+            separator = "═" * (col1_width + col2_width + col3_width + col4_width)
         
         rows = []
         total_diario = 0
@@ -119,37 +127,53 @@ class WeeklyStatsManager:
         for day in stats.keys():
             sociedad = stats[day].get('sociedad')
             diario = stats[day].get('diario')
-            date = stats[day].get('date').strftime('%d-%m-\'%y')
+            date = stats[day].get('date').strftime('%d/%m')
 
-            # Formatear valores (números o guiones)
-            diario_str = f"{diario:,}" if isinstance(diario, int) and diario > 0 else str(diario)
-            sociedad_str = f"{sociedad:,}" if isinstance(sociedad, int) and sociedad > 0 else str(sociedad)
+            # Formatear valores
+            diario_str = f"{diario}" if isinstance(diario, int) else str(diario)
+            sociedad_str = f"{sociedad}" if isinstance(sociedad, int) else str(sociedad)
             
-            # Calcular total solo si ambos son números
+            # Calcular total
             if isinstance(diario, int) and isinstance(sociedad, int):
                 total_day = diario + sociedad
-                total_str = f"{total_day:,}" if total_day > 0 else "0"
+                total_str = f"{total_day}"
                 total_diario += diario
                 total_sociedad += sociedad
             else:
                 total_str = "-"
             
-            # Usar los mismos anchos que el header
-            row = f"{f'{day}: {date}':<{col1_width}}{diario_str:<{col2_width}}{sociedad_str:<{col3_width}}{total_str:<{col4_width}}"
+            # Día abreviado
+            day_short = day[:3]  # Lun, Mar, Mié, etc.
+            day_date = f"{day_short} {date}"
+            
+            if notification_service == 'sns':
+                # Usar formato con pipes para Teams
+                row = f"{day_date:<9}| {diario_str:<6} | {sociedad_str:<7} | {total_str}"
+                # Asegurar que la fila tenga exactamente 45 caracteres
+                if len(row) < 45:
+                    row = row.ljust(45)
+            else:
+                row = f"{day_date:<12}{diario_str:<8}{sociedad_str:<9}{total_str:<8}"
             rows.append(row)
         
-        # Fila de totales
+        # Totales
         total_general = total_diario + total_sociedad
-        # Fila de totales con los mismos anchos
-        total_row = f"{'TOTAL SEMANAL':<{col1_width}}{total_diario:<{col2_width},}{total_sociedad:<{col3_width},}{total_general:<{col4_width},}"
+        if notification_service == 'sns':
+            total_row = f"TOTAL     | {total_diario:<6} |      {total_sociedad:<7} |        {total_general}"
+            if len(total_row) < 45:
+                total_row = total_row.ljust(45)
+        else:
+            total_row = f"{'TOTAL':<12}{total_diario:<8}{total_sociedad:<9}{total_general:<8}"
         
-        summary = f"""
+        summary = f"{separator}\n"
+        summary += f"{header}\n"
+        summary += f"{separator}\n"
+        summary += f"\n"
+        summary += "\n".join(rows)
+        summary += f"\n{separator}"
+        summary += f"\n{total_row}"
+        summary += f"\n{separator}"
 
-{separator}
-{header}
-{separator}
-{"".join(f"{row}\n" for row in rows)}{separator}
-{total_row}
-        """
         
-        return summary.strip()
+        return summary
+  
