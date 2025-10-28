@@ -73,7 +73,7 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
             'data_enriched': len(enriched_objects), 
             'data_filtered': len(df_filtered_by_suf),
             "message": f"Procesadas {len(processed_df)} empresas con filtro SUFs",
-            "message_business": str(business_email_sent)
+            "message_business": str(business_message_sent)
             }
         
         logs_email_sent = sns_manager.send_logs_report(log_data)
