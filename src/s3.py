@@ -207,7 +207,7 @@ class S3Manager:
             logger.error(f"Error escribiendo datos particionados: {e}")
             return None
 
-    def upload_gobierno(self, df: pd.DataFrame) -> Optional[str]:
+    def upload_gobierno(self, df: pd.DataFrame, state: str = 'gobierno') -> Optional[str]:
         """
         Carga DataFrame a formato gobierno en S3.
         
@@ -250,7 +250,7 @@ class S3Manager:
             s3_name = config.get("aws.s3_name")
             self.s3_client.put_object(
                 Bucket=config.get("aws.s3_bucket"),
-                Key=f"{s3_name}/test_folder/test_file_{date_str}.csv",
+                Key=f"{s3_name}/{state}/test_file_{date_str}.csv",
                 Body=buffer.getvalue(),
                 ContentType='text/csv'
             )

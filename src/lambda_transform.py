@@ -39,7 +39,6 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         athena_manager = AthenaManager()
         
         companies = s3_manager.download_raw()
-        
         # Extraer RUTs para consultas
         ruts = [comp.rut for comp in companies if comp.rut]
         
@@ -56,21 +55,19 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         
         # Aplicar reglas de negocio
         processed_df = reglas_de_negocio(df_filtered_by_suf, state='processed')
-
-        # Subir archivos procesados
-        processed_url = s3_manager.upload_processed(df=processed_df, state='processed')
-
         gobierno_df = reglas_de_negocio(df_filtered_by_suf, state='gobierno')
 
+        # Subir archivos procesados
+        processed_url = s3_manager.upload_processed(df=processed_df)
         gobierno_url = s3_manager.upload_gobierno(df=gobierno_df)
 
         logger.info(f"Procesados: {processed_url}")
         logger.info(f"Gobierno: {gobierno_url}")
         
         sns_manager = SNSManager()
-        business_email_sent = sns_manager.send_business_report()
+        business_message_sent = sns_manager.send_business_report()
 
-        logger.info(f"Email enviado: {business_email_sent}")
+        logger.info(f"Email enviado: {business_message_sent}")
 
         log_data = {'data_extracted': len(companies), 
             'data_enriched': len(enriched_objects), 
@@ -79,22 +76,23 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
             "message_business": str(business_email_sent)
             }
         
-        sns_manager.send_logs_report(log_data)
+        logs_email_sent = sns_manager.send_logs_report(log_data)
+
         response = {
             "statusCode": 200,
-            "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_objects)} filtered:{len(df_filtered_by_suf)}',
+            "validation": f'Extracted:{len(companies)} Enriched:{len(enriched_objects)} Filtered:{len(df_filtered_by_suf)}',
             "sufs_filter_applied": len(df_filtered_by_suf) < len(enriched_objects),
-            "sample_data": processed_df.head(3).to_dict(orient='records'),
-            "gobierno_url": str(business_email_sent),
+            "sample_metadata": processed_df.head(3).to_dict(orient='records'),
+            "business_message_status": str(business_message_sent),
+            "logs_email_sent": str(logs_email_sent),
             "body": json.dumps({
                 "processed_file": processed_url,
                 "gobierno_file": gobierno_url,
-                "message": f"Procesadas {len(processed_df)} empresas con filtro SUFs"
+                "message": f"El total de empresas clientes del banco con modificaciones son {len(processed_df)}"
             })
         }
         
         return response
-        
     except Exception as e:
         logger.exception("Error en lambda_handler de transformación")
         return {

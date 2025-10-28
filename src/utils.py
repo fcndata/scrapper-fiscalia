@@ -260,7 +260,6 @@ def filter_enriched_by_sufs(enriched_objects: List['EnrichedCompanyData'], sufs_
     logger.info(f"Filtradas {len(filtered_df)} filas de {len(enriched_objects)} usando SUFs")
     return filtered_df
 
-
 def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['EmpresaData'], funcionarios: List['FuncionarioData']) -> List['EnrichedCompanyData']:
     """
     Combina datos de empresas con información corporativa y de funcionarios.
@@ -330,7 +329,6 @@ def enrich_company_data(companies: List['CompanyMetadata'], empresas: List['Empr
     logger.info(f"Enriquecidos {len(enriched_objects)} registros de {len(companies)} originales")
     return enriched_objects
     
-
 def reglas_de_negocio(data: pd.DataFrame, state: str = 'processed') -> pd.DataFrame:
     """
     Aplica reglas de negocio estandarizadas a un DataFrame.
