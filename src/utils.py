@@ -43,8 +43,7 @@ def get_url_scrape(url_key: str) -> str:
     return f"{base_url}{dd}-{mm}-{yyyy}"
 
 def get_date_update() -> str:
-    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    return str(yesterday)
+    return (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
 def parse_total_expected(text: str) -> int:
     """
@@ -59,12 +58,17 @@ def parse_total_expected(text: str) -> int:
     Raises:
         ValueError: Si no se puede extraer el número de registros del texto.
     """
-    numeros = re.findall(r"\d+(?:[.,]\d+)*", text)
+    try: 
+        numeros = re.findall(r"\d+(?:[.,]\d+)*", text)
+        
+        if not numeros:
+            raise ValueError(f"No se pudo parsear el número de registros desde el texto: '{text}'")
+        
+        valores = [int(n.replace('.', '').replace(',', '')) for n in numeros]
     
-    if not numeros:
-        raise ValueError(f"No se pudo parsear el número de registros desde el texto: '{text}'")
-    
-    valores = [int(n.replace('.', '').replace(',', '')) for n in numeros]
+    except Exception as e:
+        logger.error(f"Error en la funcion 'parse_total_expected': {e}")
+        
     return max(valores)
 
 def extract_metadata(row: Tag) -> Tuple[int, str, str, str, str]:

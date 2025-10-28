@@ -35,7 +35,8 @@ email:
   file_name: "Modificacion_sociedades"
 
 teams:
-  webhook_url: 'https://default189d9de00fef40509094e7cf9e6b3b.b5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0483e06bebfb4ddc910a1af203b0a019/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=m8iJRPiRMiNOD2LzFL9FIkcmrxmwo4yjGxP5CLeO7S8'
+  webhook_url_negocio: 'https://default189d9de00fef40509094e7cf9e6b3b.b5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0483e06bebfb4ddc910a1af203b0a019/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=m8iJRPiRMiNOD2LzFL9FIkcmrxmwo4yjGxP5CLeO7S8'
+  webhook_url_operacion: 'https://default189d9de00fef40509094e7cf9e6b3b.b5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0483e06bebfb4ddc910a1af203b0a019/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=m8iJRPiRMiNOD2LzFL9FIkcmrxmwo4yjGxP5CLeO7S8'
 
 columns:
   all: ['fuente','rut','rut_df','razon_social', 'url', 'actuacion', 'nro_atencion', 'cve',

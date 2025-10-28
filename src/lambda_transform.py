@@ -68,15 +68,24 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any] = None) -> Dict
         logger.info(f"Gobierno: {gobierno_url}")
         
         sns_manager = SNSManager()
-        email_sent = sns_manager.send_business_report()
-        logger.info(f"Email enviado: {email_sent}")
+        business_email_sent = sns_manager.send_business_report()
 
+        logger.info(f"Email enviado: {business_email_sent}")
+
+        log_data = {'data_extracted': len(companies), 
+            'data_enriched': len(enriched_objects), 
+            'data_filtered': len(df_filtered_by_suf),
+            "message": f"Procesadas {len(processed_df)} empresas con filtro SUFs",
+            "message_business": str(business_email_sent)
+            }
+        
+        sns_manager.send_logs_report(log_data)
         response = {
             "statusCode": 200,
             "len_validation": f'extracted:{len(companies)} enriched:{len(enriched_objects)} filtered:{len(df_filtered_by_suf)}',
             "sufs_filter_applied": len(df_filtered_by_suf) < len(enriched_objects),
             "sample_data": processed_df.head(3).to_dict(orient='records'),
-            "gobierno_url": str(email_sent),
+            "gobierno_url": str(business_email_sent),
             "body": json.dumps({
                 "processed_file": processed_url,
                 "gobierno_file": gobierno_url,

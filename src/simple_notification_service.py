@@ -4,6 +4,7 @@ import urllib3
 from src.weekly_stats import WeeklyStatsManager
 from logs.logger import logger
 from config import config
+from logs.logger import logs_message, notification_structure
 
 
 class SNSManager:
@@ -12,6 +13,7 @@ class SNSManager:
     def __init__(self, region: str = 'us-east-1'):
         """Initialize AWS clients."""
         self.sns_client = boto3.client('sns', region_name=region)
+        self.date = str("%Y-%m-%d")
     
     def send_business_report(self) -> str:
         """
@@ -34,42 +36,16 @@ class SNSManager:
             
             logger.info("Creating Adaptive Cards payload")
             # Create Adaptive Cards payload for Teams
-            datos = {
-                "type": "message",
-                "attachments": [
-                    {
-                        "contentType": "application/vnd.microsoft.card.adaptive",
-                        "content": {
-                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                            "type": "AdaptiveCard",
-                            "version": "1.2",
-                            "body": [
-                                {
-                                    "type": "TextBlock",
-                                    "text": "Consolidado Modificación de Sociedades con información del Diario Oficial y Registro de Empresas y Sociedades",
-                                    "weight": "Bolder",
-                                    "size": "Medium",
-                                    "wrap": True
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": weekly_summary,
-                                    "wrap": True,
-                                    "fontType": "Monospace"
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }
-            logger.info("Payload created successfully")
+
+            message = notification_structure("Consolidado Modificación de Sociedades",
+                                   weekly_summary)
             
             # Send using urllib3 like the working code
-            webhook_url = config.get('teams.webhook_url')
+            webhook_url = config.get('teams.webhook_url_negocio')
             logger.info(f"Teams webhook URL: {webhook_url}")
             
             logger.info("Encoding message to JSON")
-            encoded_msg = json.dumps(datos).encode('utf-8')
+            encoded_msg = json.dumps(message).encode('utf-8')
             logger.info(f"Message encoded, size: {len(encoded_msg)} bytes")
             
             logger.info("Sending HTTP request to Teams")
@@ -91,9 +67,52 @@ class SNSManager:
                 
         except Exception as e:
             logger.error(f"Exception in send_business_report: {e}")
-            import traceback
-            logger.error(f"Full traceback: {traceback.format_exc()}")
             return f"Error: {str(e)}"
         
         logger.info("send_business_report completed successfully")
         return "Business report sent successfully"
+    
+    def send_logs_report(self, log_data: dict) -> str:
+        """
+        Send lambda logs notification to SNS topic.
+        
+        Args:
+            log_data (dict): Log data to send.
+        
+        Returns:
+            Status message
+        """
+        try:
+            logger.info("Starting send_logs_report")
+            http = urllib3.PoolManager()
+
+            message = notification_structure(f"Logs de ejecución: {self.date}", logs_message(log_data))
+            logger.info("Payload created successfully")
+            
+            # Send using urllib3 like the working code
+            webhook_url = config.get('teams.webhook_url_operacion')
+            logger.info(f"Teams webhook URL: {webhook_url}")
+            
+            logger.info("Encoding message to JSON")
+            encoded_msg = json.dumps(message).encode('utf-8')
+            logger.info(f"Message encoded, size: {len(encoded_msg)} bytes")
+            
+            logger.info("Sending HTTP request to Teams")
+            resp = http.request(
+                'POST', 
+                webhook_url,
+                body=encoded_msg, 
+                headers={'Content-Type': 'application/json'})
+            
+            logger.info(f"Teams response status: {resp.status}")
+            
+            if resp.status in [200, 202]:
+                logger.info(f"Logs report sent to Teams successfully (status: {resp.status})")
+                
+            else:
+                logger.error(f"Failed to send logs report: {resp.status}")
+                logger.error(f"Response data: {resp.data}")
+                return f"Error: {resp.status} - {resp.data}"
+        except Exception as e:
+            logger.error(f"Error sending logs notification: {e}")
+            return f"Error: {str(e)}"
