@@ -27,7 +27,7 @@ class WeeklyStatsManager:
                 today = datetime.now()
                 # Si es lunes, mostrar semana anterior completa
                 if today.weekday() == 0:  # 0 = lunes
-                    start_date = today - timedelta(days=7)
+                    start_date = today 
                 else:
                     # Calcular lunes de la semana actual
                     days_since_monday = today.weekday()
@@ -88,6 +88,7 @@ class WeeklyStatsManager:
             logger.error(f"Error leyendo {s3_key}: {e}")
             return None
 
+        
     def format_weekly_summary(self, stats: Dict[str, Dict[str, int]], notification_service: str = 'sns') -> str:
         """
         Formatea resumen semanal optimizado para Teams (45 caracteres max).
@@ -102,32 +103,21 @@ class WeeklyStatsManager:
             return "No hay datos disponibles."
                 # Definir anchos fijos para todas las columnas
         
-        if notification_service == 'sns':
-            # Usar formato con separadores para Teams
-            separator = "═" * 45
-            header = "Día       | Diario     | Empresa     | Total"
-            # Verificar que el header tenga 45 caracteres
-            if len(header) < 45:
-                header = header.ljust(45)
-        else:
-            # Definir anchos fijos para todas las columnas
-            col1_width = 35  # Día
-            col2_width = 16  # Diario Oficial  
-            col3_width = 20  # Registro de Empresa
-            col4_width = 8  # Total
-            
-            # Encabezado de la tabla con anchos fijos
-            header = f"{'Día':<{col1_width}}{'Diario Oficial':<{col2_width}}{'Registro de Empresa':<{col3_width}}{'Total':<{col4_width}}"
-            separator = "═" * (col1_width + col2_width + col3_width + col4_width)
-        
-        rows = []
+        space_string = '\u00A0'
+        space_column = 9
         total_diario = 0
         total_sociedad = 0
+        body_lines = []
+        rows = []
+        
+        header = f"{'Dia'.ljust(space_column,space_string)}|{'Diario'.center(space_column,space_string)}|{'Empresa'.center(space_column,space_string)}|{'Total'.center(space_column,space_string)} |"
+        
+        body_lines.append(header)
 
         for day in stats.keys():
             sociedad = stats[day].get('sociedad')
             diario = stats[day].get('diario')
-            date = stats[day].get('date').strftime('%d/%m')
+            date = stats[day].get('date').strftime('%d')
 
             # Formatear valores
             diario_str = f"{diario}" if isinstance(diario, int) else str(diario)
@@ -146,34 +136,23 @@ class WeeklyStatsManager:
             day_short = day[:3]  # Lun, Mar, Mié, etc.
             day_date = f"{day_short} {date}"
             
-            if notification_service == 'sns':
-                # Usar formato con pipes para Teams
-                row = f"{day_date:<9}| {diario_str:<6} | {sociedad_str:<7} | {total_str}"
-                # Asegurar que la fila tenga exactamente 45 caracteres
-                if len(row) < 45:
-                    row = row.ljust(45)
-            else:
-                row = f"{day_date:<12}{diario_str:<8}{sociedad_str:<9}{total_str:<8}"
+            row = f"{day_date.ljust(space_column,space_string)}|{diario_str.center(space_column,space_string)}|{sociedad_str.center(space_column,space_string)}|{total_str.center(space_column,space_string)} |"
             rows.append(row)
-        
-        # Totales
-        total_general = total_diario + total_sociedad
-        if notification_service == 'sns':
-            total_row = f"TOTAL     | {total_diario:<6} |      {total_sociedad:<7} |        {total_general}"
-            if len(total_row) < 45:
-                total_row = total_row.ljust(45)
-        else:
-            total_row = f"{'TOTAL':<12}{total_diario:<8}{total_sociedad:<9}{total_general:<8}"
-        
-        summary = f"{separator}\n"
-        summary += f"{header}\n"
-        summary += f"{separator}\n"
-        summary += f"\n"
-        summary += "\n".join(rows)
-        summary += f"\n{separator}"
-        summary += f"\n{total_row}"
-        summary += f"\n{separator}"
 
+        total_general = total_diario + total_sociedad
+        total_row = f"{'TOTAL'.ljust(space_column,space_string)}|{str(total_diario).center(space_column,space_string)}|{str(total_sociedad).center(space_column,space_string)}|{str(total_general).center(space_column,space_string)} |"
         
-        return summary
-  
+        body_lines.extend(rows)
+        body_lines.append(total_row)
+
+        line_blocks = []
+        for line in body_lines:
+            line_blocks.append({
+                "type": "TextBlock",
+                "text": line,
+                "wrap": True,
+                "spacing": "None",
+                "fontType": "Monospace"
+            })
+        
+        return line_blocks

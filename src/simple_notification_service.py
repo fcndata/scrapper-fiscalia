@@ -1,6 +1,7 @@
 import boto3
 import json
 import urllib3
+from datetime import datetime
 from src.weekly_stats import WeeklyStatsManager
 from logs.logger import logger
 from config import config
@@ -13,7 +14,7 @@ class SNSManager:
     def __init__(self, region: str = 'us-east-1'):
         """Initialize AWS clients."""
         self.sns_client = boto3.client('sns', region_name=region)
-        self.date = str("%Y-%m-%d")
+        self.date = str(datetime.now().strftime("%d-%m-%Y"))
     
     def send_business_report(self) -> str:
         """
